@@ -7,7 +7,7 @@ import math
 s=[]		#sound list
 #s=["../ressources/1.wav","","","",""]
 for i in range (0,10):
-	s.append("../ressources/1.wav")
+	s.append("../ressources/sounds/1.wav")
 
 
 def playSound(i,xy):
@@ -15,7 +15,7 @@ def playSound(i,xy):
 		print("The point is :", xy[i])
 		if (i <= len(s)):  # if a sound exist
 			print("play")
-			# playsound(s[point])
+			#playsound(s[i])
 
 def find3DCoords(event, ax):
 	pressed = ax.button_pressed
