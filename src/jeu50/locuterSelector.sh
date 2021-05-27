@@ -1,4 +1,6 @@
 #!/bin/bash
+pathToExport=''
+pathToOrigin=''
 newspk='spk2utt'
 newfeat='feats.scp'
 newutt='utt2spk'
@@ -7,6 +9,15 @@ spk2utt='spk2uttOrigin'
 utt2spk='utt2spkOrigin'
 speakerNumber=50
 ct=0
+
+newfeat=$pathToExport$feats
+newspk=$pathToExport$spk2utt
+newutt=$pathToExport$utt2spk
+
+
+feats=$pathToOrigin$feats
+spk2utt=$pathToOrigin$spk2utt
+utt2spk=$pathToOrigin$utt2spk
 
 if [ -f "$newspk" ];
 then
