@@ -4,6 +4,9 @@ import fileReader
 
 
 if __name__ == "__main__":
+	'''
+	test only
+	'''
 	data=fileReader.reading("../ressources/randomData2D.txt")
 	print(data)
 	if len(data[0]) == 3:

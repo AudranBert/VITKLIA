@@ -3,18 +3,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 from playsound import playsound
 import math
-
+import wavLink
+import random
 s=[]		#sound list
 #s=["../ressources/1.wav","","","",""]
-for i in range (0,10):
-	s.append("../ressources/sounds/1.wav")
+#for i in range (0,10):
+#	s.append("../ressources/sounds/1.wav")
 
 
-def playSound(i,xy):
+def playSound(i,xy,sounds):
 	if (i >= 0):  # if a point have been found
 		print("The point is :", xy[i])
-		if (i <= len(s)):  # if a sound exist
-			print("play")
+		if (i <= len(sounds)):  # if a sound exist
+			print(wavLink.getFileWithPathToData(sounds[i]))
 			#playsound(s[i])
 
 def find3DCoords(event, ax):
@@ -27,9 +28,9 @@ def find3DCoords(event, ax):
 	print(res)
 	return res
 
-def onclick2D(event,ax,xy):		#click on the plot
+def onclick2D(event,ax,xy,sounds):		#click on the plot
 	if event.inaxes!=None:	#inside the plot
-		print(event.xdata," ",event.ydata)
+		print("The click : ",event.xdata," ",event.ydata)
 		point=-1
 		for i in range (0,len(xy)):	#search the nearest point
 			minX=event.xdata-0.5
@@ -46,10 +47,10 @@ def onclick2D(event,ax,xy):		#click on the plot
 						point=i
 				else:
 					point=i
-		playSound(point,xy)
+		playSound(point,xy,sounds)
 
 	
-def onclick3D(event,ax,xyz):		#click on the plot
+def onclick3D(event,ax,xyz,sounds):		#click on the plot
 	if event.inaxes!=None:	#inside the plot
 		coords=find3DCoords(event, ax)
 		point=-1
@@ -70,46 +71,125 @@ def onclick3D(event,ax,xyz):		#click on the plot
 						point=i
 				else:
 					point=i
-		playSound(point,xyz)
+		playSound(point,xyz,sounds)
 
-def create2DPlot(xy):
+def chooseColor(xy,utt):
+	colors=[]
+	loc=[]
+	newutt=[]
+	ctutt=0
+	for i in utt:
+		idL=i.split("-",1)
+		id=idL[0]
+		ct=0
+		find=False
+		for j in loc:
+			if j==id:
+				#colors.append(colors[ct])
+				newutt[ct].append(xy[ctutt])
+				find=True
+				break
+			ct += 1
+		if find==False:
+			loc.append(id)
+			# if (rgb+1>=255):
+			# 	rgb=0
+			rgb=(random.uniform(0.05,1),random.uniform(0.05,1),random.uniform(0.05,1))
+			colors.append(rgb)
+			newutt.append([])
+			newutt[len(newutt)-1].append(xy[ctutt])
+			#print(id, " not found :", rgb)
+		#print(id)
+		ctutt+=1
+	#for i in newutt:
+	#	print(i)
+	print(len(colors))
+	return colors,newutt
+
+
+def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
 	fig, ax = plt.subplots()
-
-	x = [i[0] for i in xy]
-	y = [i[1] for i in xy]
-	### place the points
-	ax.scatter(x, y, c='red')
-	# ax.scatter(x, y2, c = 'blue')
-	###
+	colors,newutt=chooseColor(xy, utt)
+	x=[]
+	y=[]
+	for i in newutt: 	# for each speaker
+		x.append([])
+		y.append([])
+		for j in i:
+			x[len(x)-1].append(j[0])	# add the utt
+			y[len(y)-1].append(j[1])
+	#x = [i[0] for i in newutt]
+	#y = [i[1] for i in newutt]
+	#colormap = np.array(['r', 'g', 'b'])
+	# for i in range(0,len(colors)):
+	#
+	# 	### place the points
+	# 	ax.scatter(x[i], y[i], c=[colors[i]])
+	# 	# ax.scatter(x, y2, c = 'blue')
+	for i in range (0,len(newutt)):
+		#print()
+		#print(colors[i])
+		#print(x[i])
+		#print(y[i])
+		#print("")
+		#ax.scatter(x[i],y[i])
+		ax.scatter(x[i],y[i],s=dotSize,color=colors[i])
+	#ax.scatter(x, y,  c=colormap[colors])
+	# 	###
 	# bind press event with onclick function
-	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2D(event,ax,xy))
+	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2D(event,ax,xy,utt))
 	# plot labelling
 	plt.xlabel("X")
 	plt.ylabel("Y")
 	plt.legend(loc='upper left')
 	plt.title("PLOT")
-	plt.show()
+	plt.savefig(filePlotExport,dpi=1920)
+	if (show==True):
+		plt.show()
 
 
-def create3DPlot(xyz):
+
+def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
 	fig = plt.figure()
+	colors, newutt = chooseColor(xyz, utt)
+	x = []
+	y = []
+	z= []
+	for i in newutt:
+		x.append([])
+		y.append([])
+		z.append([])
+		for j in i:
+			x[len(x) - 1].append(j[0])
+			y[len(y) - 1].append(j[1])
+			z[len(z) - 1].append(j[1])
 	ax = fig.add_subplot(projection='3d')
-	x = [i[0] for i in xyz]
-	y = [i[1] for i in xyz]
-	z = [i[2] for i in xyz]
+	# x = [i[0] for i in xyz]
+	# y = [i[1] for i in xyz]
+	# z = [i[2] for i in xyz]
 	### place the points
-	ax.scatter(x, y,z ,c='red')
+	for i in range (0,len(newutt)):
+		#print()
+		#print(colors[i])
+		#print(x[i])
+		#print(y[i])
+		#print("")
+		#ax.scatter(x[i],y[i])
+		ax.scatter(x[i],y[i],z[i],s=dotSize,color=colors[i])
+	#ax.scatter(x, y,z ,c='red')
 	# ax.scatter(x, y2, c = 'blue')
 	###
 	# bind press event with onclick function
-	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick3D(event,ax,xyz))
+	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick3D(event,ax,xyz,utt))
 	# plot labelling
 	ax.set_xlabel("X")
 	ax.set_ylabel("Y")
 	ax.set_zlabel("Z")
 	#plt.legend(loc='upper left')
 	plt.title("PLOT")
-	plt.show()
+	plt.savefig(filePlotExport,dpi=1920)
+	if (show==True):
+		plt.show()
 
 
 

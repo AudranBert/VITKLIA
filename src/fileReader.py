@@ -4,6 +4,9 @@ from pathlib import Path
 
 
 def generateRandomData():
+	'''
+	test only
+	'''
 	n=10
 	dim3D = False
 	points = []
@@ -30,21 +33,31 @@ def generateRandomData():
 	return points
 
 def readAFile(file):
-	file1 = open(file, 'r')
+	'''
+	:param file:
+	:return speakers,data:
+	'''
+	file1 = open(file, 'r') 	# open the file
 	lines = file1.readlines()
+	speakers=[]
 	data=[]
 	for i in lines:
 		s=i.strip("\n")
 		s=s.split()
-		print(s)
-		if len(s)==3:
-			data.append((float(s[0]),float(s[1]),float(s[2])))
-		elif len(s)==2:
-			data.append((float(s[0]),float(s[1])))
+		#print(s)
+		if len(s)==4:		# 3D vectors
+			speakers.append(s[0])	# uttId
+			data.append((float(s[1]),float(s[2]),float(s[3])))	# vectors
+		elif len(s)==3:		# 2D vectors
+			speakers.append(s[0])
+			data.append((float(s[1]),float(s[2])))
 	file1.close()
-	return data
+	return speakers,data
 
 def reading(file):
+	'''
+	test only
+	'''
 	my_file =Path(file)
 	erase=False
 	data=[]
@@ -58,6 +71,13 @@ def reading(file):
 
 
 def exportData(data, file):
+	'''
+	depreciated
+	save vectors
+	:param data:
+	:param file:
+	:return:
+	'''
 	file1 = open(file, 'w')
 	for i in data:
 		for j in i:
@@ -66,6 +86,24 @@ def exportData(data, file):
 		file1.write("\n")
 	file1.close()
 
+def exportData(utt,data, file):
+	'''
+	save utt and vectors
+	:param utt:
+	:param data:
+	:param file:
+	:return:
+	'''
+	file1 = open(file, 'w')
+	ct=0
+	for i in data:
+		file1.write(utt[ct]+" ") 	# write uttId
+		for j in i:					# write vectors
+			s = str(j) + " "
+			file1.write(s)
+		file1.write("\n")
+		ct+=1
+	file1.close()
 
 if __name__ == "__main__":
 	print("Reading")

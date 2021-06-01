@@ -16,18 +16,19 @@ if __name__ == "__main__":
     numerotaion=True
 
     ## args
+    # do not give a same file name twice
     if (len(sys.argv)>=2):
-        newspk=sys.argv[1]
+        newspk=sys.argv[1]      # new spk2utt file
     if (len(sys.argv)>=3):
-        newFeat=sys.argv[2]
+        newFeat=sys.argv[2]     # new feats.scp file
     if (len(sys.argv)>=4):
-        newutt=sys.argv[3]
+        newutt=sys.argv[3]      # new utt2spk file
     if (len(sys.argv)>=5):
-        feat=sys.argv[4]
+        feat=sys.argv[4]        # feat file
     if (len(sys.argv)>=6):
-        utt2spk=sys.argv[5]
+        utt2spk=sys.argv[5]     # utt2spk
     if (len(sys.argv) >= 7):
-        ct = int(sys.argv[6])
+        ct = int(sys.argv[6])   # file numbering
     #if (len(sys.argv) >= 8):
     #    numerotaion = sys.argv[7]
     ## numerotation
@@ -39,7 +40,7 @@ if __name__ == "__main__":
     #             ct+=1
     #         newFeat=n[0]+str(ct)+"."+n[1]
 
-    if (ct!=0):
+    if (ct!=0):     # file numbering
         n = newFeat.split(".")
         if len(n)==2:
             newFeat = n[0] + str(ct) +"."+ n[1]
@@ -55,13 +56,13 @@ if __name__ == "__main__":
     print(newFeat)
     print(newutt)
     ## main code
-    if(os.path.isfile(newspk) and os.path.isfile(feat)):
+    if(os.path.isfile(newspk) and os.path.isfile(feat)):    # check if files exist
         print("FILES FOUND")
         out = open(newspk, "r")
 
         lines = out.readlines()
         idSpeaker = []
-        for i in lines:
+        for i in lines:     # for each speaker
             s = i.strip("\n")
             s = s.split()
             #print(s[0])
@@ -71,15 +72,16 @@ if __name__ == "__main__":
         result = open(newFeat, "w")
         newspkFile=open(newutt,"w")
         ct=0
-        for line in feats:
+        for line in feats:      # for each lines of feats
             s = line.strip("\n")
             s = s.split()
             for i in idSpeaker:
                 r=re.match(i+"-", s[0])
-                if(r):
+                if(r):      # speaker found
                     #print(s[0])
                     result.write(s[0]+" "+s[1]+"\n")
                     newspkFile.write(s[0]+" "+i+"\n")
+                    #break
             ct+=1
             if (ct%10000==0):
                 print("Lines ",ct," verified...")

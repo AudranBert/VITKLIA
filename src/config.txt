@@ -1,0 +1,15 @@
+# mode
+mode = reduction
+
+# reduction properties (mode=reduction)
+xvectorsFile= xvectors.txt
+dimension = 2
+exportReductionFile= emb2D.txt
+
+# no reduction	(mode=read)
+readingFile = emb2D.txt
+
+# plot properties
+plotFile = plot.jpeg
+showPlot = True
+dotSize = 20
