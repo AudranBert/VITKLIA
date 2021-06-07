@@ -1,5 +1,5 @@
 # mode
-mode = reduction
+mode = read
 
 # reduction properties (mode=reduction)
 xvectorsFile= xvectors.txt

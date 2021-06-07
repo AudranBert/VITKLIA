@@ -147,7 +147,41 @@ def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
 	if (show==True):
 		plt.show()
 
-
+def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
+	fig, ax = plt.subplots()
+	colors,newutt=chooseColor(xy, utt)
+	x=[]
+	y=[]
+	for i in newutt: 	# for each speaker
+		x.append([])
+		y.append([])
+		for j in i:
+			x[len(x)-1].append(j[0])	# add the utt
+			y[len(y)-1].append(j[1])
+	xp=[]
+	yp=[]
+	for i in prototypes:
+		xp.append(i[0])	# add the utt
+		yp.append(i[1])
+	xc=[]
+	yc=[]
+	for i in criticisms:
+		xc.append(i[0])	# add the utt
+		yc.append(i[1])
+	for i in range (0,len(newutt)):
+		ax.scatter(x[i],y[i],s=dotSize,color=colors[i])
+	for i in range (0,len(prototypes)):
+		ax.scatter(xp[i], yp[i], s=(dotSize*1.1), marker="D",color='black')
+	for i in range (0,len(criticisms)):
+		ax.scatter(xc[i], yc[i], s=(dotSize*1.1), marker="^",color='black')
+	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2D(event,ax,xy,utt))
+	plt.xlabel("X")
+	plt.ylabel("Y")
+	plt.legend(loc='upper left')
+	plt.title("PLOT")
+	plt.savefig(filePlotExport,dpi=1920)
+	if (show==True):
+		plt.show()
 
 def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
 	fig = plt.figure()

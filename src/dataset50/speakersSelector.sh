@@ -1,23 +1,37 @@
 #!/bin/bash
-pathToExport=''
+
+# Parameters
+
+pathToExport='Out/'
 pathToOrigin=''
+
 newspk='spk2utt'
 newfeat='feats.scp'
 newutt='utt2spk'
+
 feats='featsOrigin.scp'
 spk2utt='spk2uttOrigin'
 utt2spk='utt2spkOrigin'
+
 speakerNumber=50
 ct=0
 
-newfeat=$pathToExport$feats
-newspk=$pathToExport$spk2utt
-newutt=$pathToExport$utt2spk
+createATestDataSet=True
+speakerTestNumber=$((speakerNumber/10))
+testExtension='Test'
 
+
+
+# Code 
+
+newfeat=$pathToExport$newfeat
+newspk=$pathToExport$newspk
+newutt=$pathToExport$newutt
 
 feats=$pathToOrigin$feats
 spk2utt=$pathToOrigin$spk2utt
 utt2spk=$pathToOrigin$utt2spk
+
 
 if [ -f "$newspk" ];
 then
@@ -41,5 +55,15 @@ fi
 
 
 cat $spk2utt | shuf | head -n $speakerNumber > $newspk
+
+
 echo "Get utterances :"
-python3 featSelector.py $newspk $newfeat $newutt $feats $utt2spk $ct
+python3 featSelector.py False $newspk $newfeat $newutt $feats $utt2spk $ct
+
+if [ "$createATestDataSet" ];
+then
+	testspk=${newspk}${testExtension}
+	cat $newspk | shuf | head -n $speakerTestNumber > $testspk
+	echo "Get Test utterances :"
+	python3 speakersSelector.py True $testspk $newfeat $newutt $newfeat $utt2spk $ct $testExtension
+fi	
