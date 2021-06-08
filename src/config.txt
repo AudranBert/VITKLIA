@@ -4,7 +4,7 @@ mode = read
 # reduction properties (mode=reduction)
 xvectorsFile= xvectors.txt
 dimension = 2
-exportReductionFile= emb2D.txt
+exportReductionFile= emb2DTEST.txt
 
 # no reduction	(mode=read)
 readingFile = emb2D.txt

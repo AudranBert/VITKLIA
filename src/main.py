@@ -1,5 +1,6 @@
 
 import plotCreator
+import xvectorsParser
 import fileReader
 import prototypes
 import reductionVectors
@@ -30,6 +31,8 @@ def load(file):
     :return vectors:
     '''
     utt,vectors=fileReader.readAFile(file)  # read vectors
+
+
     return utt,vectors
 
 def errorExit(msg,code=-1):
@@ -101,7 +104,8 @@ if __name__ == "__main__":
     else:
         errorExit("Missing conf file")
     if mode=="reduction":   # mode  reduction
-        utt,vectors=reduce(xvectorsFile,exportReductionFile)
+        utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,dimension)
+        utt,vectors=load(exportReductionFile)
     elif mode=="read":      # reading mode
         utt,vectors=load(readingFile)
     else:

@@ -8,7 +8,7 @@ import xvectorsParser
 import umap
 import plotCreator
 import fileReader
-
+import main
 
 
 
@@ -27,7 +27,7 @@ def printAll(utt,vectors):
         print(vectors[i])
         print()
 
-def reduce(filePath,fileToExport):
+def reduce(filePath,fileToExport,dimension):
     '''
     transform vectors into 2D or 3D vectors
     :param filePath:
@@ -36,6 +36,8 @@ def reduce(filePath,fileToExport):
     :return embedding:
     '''
     utt,vectors=xvectorsParser.readVectors(filePath)        # read xvectors
+    #lpos = xvectorsParser.getExtent(vectors)
+    #vectors=xvectorsParser.removeVariables(vectors,lpos)
     #printAll(utt,vectors)
     #reducer=umap.UMAP()
     #scaled_vectors = umap.StandardScaler().fit_transform(vectors)
@@ -55,7 +57,7 @@ def reduce(filePath,fileToExport):
         fileReader.exportData(utt, embedding, fileToExport)      # save 2D vectors
         return utt,embedding
     else:
-        errorExit("mode must be read or reduction")
+        main.errorExit("mode must be read or reduction")
 
 
 
