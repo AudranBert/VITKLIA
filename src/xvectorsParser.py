@@ -68,15 +68,16 @@ def getSup(list,value,debug=False):
     print("nombre de variables dont etendue sup a ", value, ": ", ctSup)
     print("moyenne des variables avec etendue sup a ",value,": ",meansup1)
 
-def getInfos(extend):
+def getInfos(extend,vectors,plot=False,debug=False):
     sumExtend=0
     for i in range(0,len(extend)):
         sumExtend+=extend[i]
     print("--------")
     print("Statistiques globales")
     print("Vecteurs du fichier:",path)
+    print("nombre de vecteurs:",len(vectors))
     print("nombre de variables:",len(extend))
-    print("moyenne totale:", sumExtend/len(extend))
+    print("moyenne des etendues totale:", sumExtend/len(extend))
     print("somme des etendues",sumExtend)
     print("--------")
     print("Statistiques des plus grandes etendues")
@@ -93,9 +94,10 @@ def getInfos(extend):
     print("Statistiques Ciblées")
     getSup(extend,8)
     print("--------")
-    #prepBarPlot(extend,"Extend")
+    prepBarPlotLoss(extend,sumExtend,"Curve of sum extent")
+    prepBarPlot(extend,"Bar plot of the extend of the variables")
 
-def getExtent(vectors):
+def getExtent(vectors,debug=False):
     min=[]
     max=[]
     for i in range(0,len(vectors)):
@@ -113,30 +115,65 @@ def getExtent(vectors):
         extend.append(max[i]-min[i])
     qtt = len(extend) // 10
     lmax,lpos,sumMax=getListMax(extend,qtt)
-    getInfos(extend)
+    if debug:
+        getInfos(extend,vectors,True)
     return lpos
 
-def prepBarPlot(list,title):
-    min=min(list)
-    max=max(list)
-    extendPlot=max-min
+def prepBarPlot(list,title,total=False):
+    minVal=min(list)
+    maxVal=max(list)
+    extendPlot=maxVal-minVal
     nbStep=10
-    step=extendPlot//nbStep
+    step=extendPlot/nbStep
     bar=[]
     value=[]
     for i in range(0,nbStep):
-        bar.append(i*step)
+        bar.append(">"+str(round(i*step,1)))
+        value.append(0)
+    if total:
+        bar.append("Total")
         value.append(0)
     for i in range(0,len(list)) :
-        print("blop")
+        for t in reversed(range(0,nbStep)) :
+            if (list[i]>step*t):
+                value[t]+=1
+                if total:
+                    value[nbStep]+=1
+                break
+
     plot(bar,value,title)
 
-def plot(bar,value,title="plot"):
-    fig = plt.figure()
-    ax = fig.add_axes([0, 0, 1, 1])
-    langs = ['C', 'C++', 'Java', 'Python', 'PHP']
-    ax.bar(bar, value)
+def prepBarPlotLoss(list,total,title="Plot"):
+    value=[]
+    value.append(total)
+    list.sort(reverse=True)
+    ct=1
+    for i in range(0,len(list)):
+        value.append(value[ct-1]-list[i])
+        ct+=1
+
+    plt.plot(value)
+    plt.ylabel("sum of extent")
+    plt.xlabel("number of removed variables")
     plt.title(title)
+    plt.savefig("plot/"+title+".jpeg")
+    print("plot saved:", "plot/" + title + ".jpeg")
+    plt.show()
+
+    #plot(bar,value,title,"sum of extents","number of variables remove")
+
+def plot(bar,value,title="plot",ylabel="Number of variables",xlabel="Value of the extend"):
+    #fig = plt.figure()
+    #ax = fig.add_axes([0, 1])
+
+    plt.bar(bar, value)
+    plt.xticks( bar)
+    #plt.yticks( [0,max(value)//2,max(value)] )
+    plt.title(title)
+    plt.ylabel(ylabel)
+    plt.xlabel(xlabel)
+    plt.savefig("plot/"+title+".jpeg")
+    print("plot saved:", "plot/"+title+".jpeg")
     plt.show()
 
 def removeVariables(vectors,lpos):
@@ -151,7 +188,10 @@ def removeVariables(vectors,lpos):
     return newVectors
 
 if __name__ == "__main__":
+    '''
+    scritp that allows to have acces to infos about variables
+    '''
     if (len(sys.argv) >= 2):
         path=(sys.argv[1])
     utt,vectors=readVectors(path)
-    variables=getExtent(vectors)
+    variables=getExtent(vectors,True)
