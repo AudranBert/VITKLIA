@@ -8,6 +8,8 @@ import sys
 import os
 
 # global variables
+resources=""
+sounds=""
 mode="read"
 # reduction
 xvectorsFile=""
@@ -51,6 +53,8 @@ def readConf(fileName):
     :param fileName:
     :return:
     '''
+    global resources
+    global sounds
     global mode
     global dimension
     global xvectorsFile
@@ -60,7 +64,7 @@ def readConf(fileName):
     global showPlot
     global dotSize
     if not os.path.isfile(fileName):        # check if conf file exist
-        errorExit("Conf file :", fileName," does not exist")
+        errorExit("Conf file : "+fileName+" does not exist")
     else:
         with open( fileName) as file:
             for line in file:       # read all lines
@@ -90,9 +94,17 @@ def readConf(fileName):
                         showPlot=bool(l[1])
                     elif (l[0]=="dotSize"):
                         dotSize=int(l[1])
+                    elif (l[0]=="resources_dir"):
+                        resources=l[1]
+                    elif (l[0] == "sounds_dir"):
+                        sounds = l[1]
     #print("SETTINGS :")
     #print(mode)
     #print(dimension)
+    xvectorsFile=resources+os.path.sep+xvectorsFile
+    exportReductionFile=resources+os.path.sep+exportReductionFile
+    readingFile=resources+os.path.sep+readingFile
+    filePlotExport=resources+os.path.sep+filePlotExport
 
 
 if __name__ == "__main__":
@@ -104,9 +116,13 @@ if __name__ == "__main__":
     else:
         errorExit("Missing conf file")
     if mode=="reduction":   # mode  reduction
+        if not os.path.isfile(xvectorsFile):  # check if conf file exist
+            errorExit("File : " + xvectorsFile + " does not exist")
         utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,dimension)
         utt,vectors=load(exportReductionFile)
     elif mode=="read":      # reading mode
+        if not os.path.isfile(readingFile):  # check if conf file exist
+            errorExit("File : " + xvectorsFile + " does not exist")
         utt,vectors=load(readingFile)
     else:
         errorExit("Mode invalid")
@@ -116,9 +132,9 @@ if __name__ == "__main__":
     #
     #
     if (len(vectors[0])==3):    # if 3D vectors
-        plotCreator.create3DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
+        plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,showPlot,filePlotExport,dotSize)
     else:       # 2D vectors
-        plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, showPlot, filePlotExport, dotSize)
+        plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, showPlot, filePlotExport, dotSize,sounds)
         #plotCreator.create2DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
     #print(vectors.shape)
 

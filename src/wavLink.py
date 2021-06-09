@@ -32,14 +32,14 @@ def getFile(pathToWav,id):
         return None     # file not found
 
 
-def getFileWithPathToData(id):
+def getFileWithPathToData(path,id):
     '''
     :param id:
     :return path:
     '''
     cwd = os.getcwd()       # get current path
     #pathToStklia="path"
-    pathToData=cwd+os.path.sep+"data"+os.path.sep+"wav"+os.path.sep+voxceleb+os.path.sep     #path to Voxceleb1
+    pathToData=path+os.path.sep+"data"+os.path.sep+"wav"+os.path.sep+voxceleb+os.path.sep     #path to Voxceleb1
     #print(cwd)
     path=getFile(pathToData,id)     # path of the wav
     return path

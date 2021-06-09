@@ -10,12 +10,18 @@ s=[]		#sound list
 #for i in range (0,10):
 #	s.append("../ressources/sounds/1.wav")
 
+sounds_dir=""
+
+def setSound(dir):
+	global sounds_dir
+	sounds_dir=dir
+
 
 def playSound(i,xy,sounds):
 	if (i >= 0):  # if a point have been found
 		print("The point is :", xy[i])
 		if (i <= len(sounds)):  # if a sound exist
-			print(wavLink.getFileWithPathToData(sounds[i]))
+			print(wavLink.getFileWithPathToData(sounds_dir,sounds[i]))
 			#playsound(s[i])
 
 def find3DCoords(event, ax):
@@ -107,7 +113,8 @@ def chooseColor(xy,utt):
 	return colors,newutt
 
 
-def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
+def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+	setSound(soundsdir)
 	fig, ax = plt.subplots()
 	colors,newutt=chooseColor(xy, utt)
 	x=[]
@@ -147,7 +154,8 @@ def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
 	if (show==True):
 		plt.show()
 
-def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
+def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+	setSound(soundsdir)
 	fig, ax = plt.subplots()
 	colors,newutt=chooseColor(xy, utt)
 	x=[]
@@ -183,7 +191,58 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 	if (show==True):
 		plt.show()
 
-def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
+def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+	setSound(soundsdir)
+	fig = plt.figure()
+	colors, newutt = chooseColor(xyz, utt)
+	x = []
+	y = []
+	z= []
+	for i in newutt:
+		x.append([])
+		y.append([])
+		z.append([])
+		for j in i:
+			x[len(x) - 1].append(j[0])
+			y[len(y) - 1].append(j[1])
+			z[len(z) - 1].append(j[1])
+	xp=[]
+	yp=[]
+	zp=[]
+	for i in prototypes:
+		xp.append(i[0])	# add the utt
+		yp.append(i[1])
+		zp.append(i[2])
+	xc=[]
+	yc=[]
+	zc=[]
+	for i in criticisms:
+		xc.append(i[0])	# add the utt
+		yc.append(i[1])
+		zc.append(i[2])
+	ax = fig.add_subplot(projection='3d')
+	### place the points
+	for i in range (0,len(newutt)):
+		ax.scatter(x[i],y[i],z[i],s=dotSize,color=colors[i])
+	###
+	for i in range (0,len(prototypes)):
+		ax.scatter(xp[i], yp[i],zp[i], s=(dotSize*1.1), marker="D",color='black')
+	for i in range (0,len(criticisms)):
+		ax.scatter(xc[i], yc[i],zc[i], s=(dotSize*1.1), marker="^",color='black')
+	# bind press event with onclick function
+	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick3D(event,ax,xyz,utt))
+	# plot labelling
+	ax.set_xlabel("X")
+	ax.set_ylabel("Y")
+	ax.set_zlabel("Z")
+	#plt.legend(loc='upper left')
+	plt.title("PLOT")
+	plt.savefig(filePlotExport,dpi=1920)
+	if (show==True):
+		plt.show()
+
+def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+	setSound(soundsdir)
 	fig = plt.figure()
 	colors, newutt = chooseColor(xyz, utt)
 	x = []
@@ -224,8 +283,6 @@ def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20):
 	plt.savefig(filePlotExport,dpi=1920)
 	if (show==True):
 		plt.show()
-
-
 
 if __name__ == "__main__":
 	xy=generateRandomGraphic()
