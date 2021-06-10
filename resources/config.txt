@@ -1,19 +1,22 @@
 # resources
-resources_dir=../resources
-sounds_dir=../resources/sounds
+resources_dir: ../resources
+sounds_dir: "../resources/sounds"
 
 # mode
-mode = read
+mode: "read"
 
 # reduction properties (mode=reduction)
-xvectorsFile= xvectors.txt
-dimension = 2
-exportReductionFile= emb2DTEST.txt
+xvectorsFile: "xvectors.txt"
+dimension: 2
+exportReductionFile: emb2DTEST.txt
 
 # no reduction	(mode=read)
-readingFile = emb3D.txt
+readingFile: emb2D.txt
 
 # plot properties
-plotFile = plot/plot2.jpeg
-showPlot = True
-dotSize = 20
+plotFile: "plot/plot2.jpeg"
+showPlot: True
+dotSize: 20
+
+# prototypes
+findProto: True

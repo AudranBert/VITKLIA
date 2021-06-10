@@ -19,7 +19,9 @@ def setSound(dir):
 
 def playSound(i,xy,sounds):
 	if (i >= 0):  # if a point have been found
+		spk=sounds[i].split("-")
 		print("The point is :", xy[i])
+		print("The speaker is :",spk[0])
 		if (i <= len(sounds)):  # if a sound exist
 			print(wavLink.getFileWithPathToData(sounds_dir,sounds[i]))
 			#playsound(s[i])
@@ -179,9 +181,10 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 	for i in range (0,len(newutt)):
 		ax.scatter(x[i],y[i],s=dotSize,color=colors[i])
 	for i in range (0,len(prototypes)):
-		ax.scatter(xp[i], yp[i], s=(dotSize*1.1), marker="D",color='black')
+		ax.scatter(xp[i], yp[i], s=(dotSize*0.9), marker="D",color='black')
 	for i in range (0,len(criticisms)):
-		ax.scatter(xc[i], yc[i], s=(dotSize*1.1), marker="^",color='black')
+		ax.scatter(xc[i], yc[i], s=(dotSize*0.9), marker="^",color='black')
+		#plt.clabel(ax,colors='blue')
 	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2D(event,ax,xy,utt))
 	plt.xlabel("X")
 	plt.ylabel("Y")

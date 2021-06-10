@@ -6,6 +6,8 @@ import prototypes
 import reductionVectors
 import sys
 import os
+import argparse
+import yaml
 
 # global variables
 resources=""
@@ -13,14 +15,14 @@ sounds=""
 mode="read"
 # reduction
 xvectorsFile=""
-dimension= "2"
+#dimension= "2"
 exportReductionFile=""
 #reading
 readingFile=""
 # plot
-showPlot = True
+#showPlot = True
 filePlotExport = "plot.jpeg"
-dotSize = 20
+#dotSize = 20
 # others
 utt = []
 vectors = []
@@ -65,79 +67,62 @@ def readConf(fileName):
     global dotSize
     if not os.path.isfile(fileName):        # check if conf file exist
         errorExit("Conf file : "+fileName+" does not exist")
+    yaml_file = open(fileName, 'r')
+    yaml_content = yaml.load(yaml_file, Loader=yaml.FullLoader)
+    if args.mode!="":
+        mode=args.mode
+    elif yaml_content.get("mode")!="" and yaml_content.get("mode")!=None:
+        mode=yaml_content.get("mode")
     else:
-        with open( fileName) as file:
-            for line in file:       # read all lines
-                l=line.split("=")
-                l[0]=l[0].strip()
-                #if (l[0].startswith("#")):
-                    #print("start # : ",l[0])
-                #elif ( l[0]==""):
-                    #print("empty line")
-                if(not(l[0].startswith("#")) and not(l[0]=="")):
-                    l[1] = l[1].strip()
-                    l[1] = l[1].strip("\n")
-                    #print(l)
-                    if (l[0]=="mode"):
-                        mode=l[1]
-                    elif (l[0]=="dimension"):
-                        dimension=l[1]
-                    elif (l[0]=="xvectorsFile"):
-                        xvectorsFile=l[1]
-                    elif (l[0]=="exportReductionFile"):
-                        exportReductionFile=l[1]
-                    elif (l[0]=="readingFile"):
-                        readingFile=l[1]
-                    elif (l[0]=="plotFile"):
-                        filePlotExport=l[1]
-                    elif (l[0]=="showPlot"):
-                        showPlot=bool(l[1])
-                    elif (l[0]=="dotSize"):
-                        dotSize=int(l[1])
-                    elif (l[0]=="resources_dir"):
-                        resources=l[1]
-                    elif (l[0] == "sounds_dir"):
-                        sounds = l[1]
-    #print("SETTINGS :")
-    #print(mode)
-    #print(dimension)
+        print("no mode defined")
+    xvectorsFile=yaml_content.get("xvectorsFile")
+    exportReductionFile=yaml_content.get("exportReductionFile")
+    readingFile=yaml_content.get("readingFile")
+    filePlotExport=yaml_content.get("plotFile")
+    sounds=yaml_content.get("sounds_dir")
+    resources=yaml_content.get("resources_dir")
     xvectorsFile=resources+os.path.sep+xvectorsFile
     exportReductionFile=resources+os.path.sep+exportReductionFile
     readingFile=resources+os.path.sep+readingFile
     filePlotExport=resources+os.path.sep+filePlotExport
+    return yaml_content
 
 
 if __name__ == "__main__":
-
-    if (len(sys.argv) >= 2):    # if conf file is given
-        readConf(sys.argv[1])
-        if (len(sys.argv) >= 3):    # if mode is given
-            mode=sys.argv[2]
-    else:
-        errorExit("Missing conf file")
+    parser=argparse.ArgumentParser()
+    parser.add_argument("--conf",default="",help="name of the config file")
+    parser.add_argument("--mode", default="", help="mode")
+    args=parser.parse_args()
+    #readConf(args.conf)
+    yaml_content=readConf(args.conf)
+    # for key, value in yaml_content.items():
+    #     print(f"{key}: {value}")
     if mode=="reduction":   # mode  reduction
         if not os.path.isfile(xvectorsFile):  # check if conf file exist
             errorExit("File : " + xvectorsFile + " does not exist")
-        utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,dimension)
+        utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,yaml_content.get("dimension"))
         utt,vectors=load(exportReductionFile)
     elif mode=="read":      # reading mode
         if not os.path.isfile(readingFile):  # check if conf file exist
-            errorExit("File : " + xvectorsFile + " does not exist")
+            errorExit("File : " + readingFile + " does not exist")
         utt,vectors=load(readingFile)
     else:
         errorExit("Mode invalid")
-    #print(len(vectors[0]))
-    #prototypes.classify(vectors,utt)
-    lprototypes,lcriticisms=prototypes.prototypesEachSpeaker(vectors,utt)
-    #
-    #
-    if (len(vectors[0])==3):    # if 3D vectors
-        plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,showPlot,filePlotExport,dotSize)
-    else:       # 2D vectors
-        plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, showPlot, filePlotExport, dotSize,sounds)
-        #plotCreator.create2DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
+    # #print(len(vectors[0]))
+    # #prototypes.classify(vectors,utt)
+    if yaml_content.get("findProto"):
+        lprototypes,lcriticisms=prototypes.prototypesEachSpeaker(vectors,utt)
+        if (len(vectors[0])==3):    # if 3D vectors
+            plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
+        else:       # 2D vectors
+            plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),sounds)
+            #plotCreator.create2DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
+    else:
+        if (len(vectors[0])==3):    # if 3D vectors
+            plotCreator.create3DPlot(vectors,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
+        else:       # 2D vectors
+            plotCreator.create2DPlot(vectors, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),sounds)
     #print(vectors.shape)
-
 
 
 

@@ -2,6 +2,8 @@ import math
 
 import plotCreator
 import fileReader
+import tqdm
+from tqdm import trange
 
 
 def kernel(i,j):
@@ -63,19 +65,13 @@ def prototypes(vectors,utt,nbPrototypes=2):
 	proto=[]
 	criti=[]
 	while len(proto)!=nbPrototypes:
-		print("---------------------")
+		#print("---------------------")
 		MMD=[]
 		for i in range (0,len(vectors)):
 			z.append(vectors[i])
 			#print(z)
 			mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, vectors, len(z), len(vectors)) + sum3MMD(vectors, len(vectors))
 			#print(sum1MMD(z, nbPrototypes))
-			if(i>60):
-				print("--------------")
-				print(sum1MMD(z, len(z)))
-				print(sum2MMD(z, vectors, len(z), len(vectors)))
-				print(sum3MMD(vectors, len(vectors)))
-				print("--------------")
 			z.pop()
 			MMD.append(mmd2)
 		min = -1
@@ -94,10 +90,10 @@ def prototypes(vectors,utt,nbPrototypes=2):
 			z.append(vectors[min])
 		if(max!=-1):
 			criti.append(vectors[max])
-		print(MMD)
-		print("min :", min, " : ",MMD[min])
-		print("max :",max, " : ", MMD[max])
-		print(z)
+		#print(MMD)
+		#print("min :", min, " : ",MMD[min])
+		#print("max :",max, " : ", MMD[max])
+		#print(z)
 	return proto,criti
 
 def prototypesEachSpeaker(vectors,utt):
@@ -106,11 +102,12 @@ def prototypesEachSpeaker(vectors,utt):
 	z=[]
 	proto=[]
 	criti=[]
-	ct=0
-	while len(proto)!=nbPrototypes and ct<len(newutt):
-		print("---------------------")
+	#ct=0
+	print("Prototypes and criticisms...")
+	for ct in trange(nbPrototypes) :
+		#print("---------------------")
 		MMD=[]
-		for i in range (0,len(newutt[ct])):
+		for i in range(len(newutt[ct])):
 			z.append(newutt[ct][i])
 			#print(z)
 			mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newutt[ct], len(z), len(newutt[ct])) + sum3MMD(newutt[ct], len(newutt[ct]))
@@ -139,11 +136,11 @@ def prototypesEachSpeaker(vectors,utt):
 			z.append(newutt[ct][min])
 		if(max!=-1):
 			criti.append(newutt[ct][max])
-		print(MMD)
-		print("min :", min, " : ",MMD[min])
-		print("max :",max, " : ", MMD[max])
-		print(z)
-		ct=ct+1
+		#print(MMD)
+		#print("min :", min, " : ",MMD[min])
+		#print("max :",max, " : ", MMD[max])
+		#print(z)
+		#ct=ct+1
 	return proto,criti
 
 
