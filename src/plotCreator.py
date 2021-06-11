@@ -1,3 +1,4 @@
+import os.path
 import re
 import matplotlib.pyplot as plt
 import numpy as np
@@ -114,6 +115,17 @@ def chooseColor(xy,utt):
 	print(len(colors))
 	return colors,newutt
 
+def checkDir(path):
+	p=path.split("/")
+	p.pop()
+	np=""
+	for i in p:
+		np+=i+os.path.sep
+	if (os.path.isdir(np)):
+		return True
+	else:
+		print("Directory :"+np+" does not exist")
+		return False
 
 def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
 	setSound(soundsdir)
@@ -152,7 +164,8 @@ def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsd
 	plt.ylabel("Y")
 	plt.legend(loc='upper left')
 	plt.title("PLOT")
-	plt.savefig(filePlotExport,dpi=1920)
+	if checkDir(filePlotExport):
+		plt.savefig(filePlotExport,dpi=1920)
 	if (show==True):
 		plt.show()
 
@@ -190,7 +203,8 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 	plt.ylabel("Y")
 	plt.legend(loc='upper left')
 	plt.title("PLOT")
-	plt.savefig(filePlotExport,dpi=1920)
+	if checkDir(filePlotExport):
+		plt.savefig(filePlotExport,dpi=1920)
 	if (show==True):
 		plt.show()
 
@@ -240,7 +254,8 @@ def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExpo
 	ax.set_zlabel("Z")
 	#plt.legend(loc='upper left')
 	plt.title("PLOT")
-	plt.savefig(filePlotExport,dpi=1920)
+	if checkDir(filePlotExport):
+		plt.savefig(filePlotExport,dpi=1920)
 	if (show==True):
 		plt.show()
 
@@ -283,7 +298,8 @@ def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,sounds
 	ax.set_zlabel("Z")
 	#plt.legend(loc='upper left')
 	plt.title("PLOT")
-	plt.savefig(filePlotExport,dpi=1920)
+	if checkDir(filePlotExport):
+		plt.savefig(filePlotExport,dpi=1920)
 	if (show==True):
 		plt.show()
 

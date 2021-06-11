@@ -30,6 +30,23 @@ def readVectors(filePath):
             ct+=1
     return utt,vectors
 
+def getListMin(list, number,debug=False):
+    lmin = []
+    lpos=[]
+    sumMin=0
+    for i in range(0,number):
+        min=0
+        pos=0
+        for j in range(0,len(list)):
+            if min>list[j] and list[j] not in lmax:
+                min=list[j]
+                pos=j
+        lpos.append(pos)
+        lmin.append(min)
+        sumMin += min
+        if debug:
+            print(min)
+    return lmin,lpos,sumMin
 
 def getListMax(list, number,debug=False):
     lmax = []
@@ -97,7 +114,7 @@ def getInfos(extend,vectors,plot=False,debug=False):
     prepBarPlotLoss(extend,sumExtend,"Curve of sum extent")
     prepBarPlot(extend,"Bar plot of the extend of the variables")
 
-def getExtent(vectors,debug=False):
+def getExtent(vectors,option,qtt,debug=False):
     min=[]
     max=[]
     for i in range(0,len(vectors)):
@@ -113,8 +130,11 @@ def getExtent(vectors,debug=False):
     extend=[]
     for i in range(0,len(min)):
         extend.append(max[i]-min[i])
-    qtt = len(extend) // 10
-    lmax,lpos,sumMax=getListMax(extend,qtt)
+    #qtt = len(extend) // 10
+    if option=="best":
+        lmax,lpos,sumMax=getListMax(extend,qtt)
+    elif option=="worst":
+        lmin, lpos, sumMin = getListMin(extend, qtt)
     if debug:
         getInfos(extend,vectors,True)
     return lpos

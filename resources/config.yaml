@@ -1,0 +1,31 @@
+# resources
+resources_dir: ../resources
+sounds_dir: "../resources/sounds"
+
+# mode
+mode: "reduction"
+
+# reduction properties (mode=reduction)
+xvectorsFile: "xvectors.txt"
+variableSelectionOption: ""
+# if option set, define the number of variables selected
+variablesSelectionNumber: 20
+exportReductionFile: emb2DTEST.txt
+# UMAP
+dimension: 2
+# smaller=more local preservation (default: 15)
+n_neighbor: 15
+# (default 0.1)
+min_dist: 0.2
+
+# no reduction	(mode=read)
+readingFile: emb2D.txt
+
+# plot properties
+plotFile: "plot/plotM02.jpg"
+showPlot: False
+dotSize: 20
+
+# prototypes
+findProto: True
+gridSearch: True

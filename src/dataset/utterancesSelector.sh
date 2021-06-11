@@ -2,32 +2,46 @@
 
 # Parameters
 
+# path where the new dataset will be
 pathToExport='Out/'
+
+# path where the dataset is
 pathToOrigin=''
 
+# name of the new spk2utt file
 newspk='spk2utt'
+# name of the new feats.scp file
 newfeat='feats'
+# name of the new utt2spk file
 newutt='utt2spk'
 
+# name of the feats file where we take utterances
 feats='featsOrigin.scp'
+# name of the spk2utt file where we take speakers
 spk2utt='spk2uttOrigin'
+# name of the utt2spk file
 utt2spk='utt2spkOrigin'
 
+# numer of total utterances 
 utteranceNumber=50
-ct=0
 
+# train files will have "newspk+trainExtension" for example
 trainExtension='Train'
 
+# number of utterances in the test
 utteranceTestNumber=$(( utteranceNumber / 5 ))
+# test files will have "newspk+testExtension" for example
 testExtension='Test'
 
+# number of utterances in the dev
 utteranceDevNumber=$(( utteranceNumber / 10 ))
+# dev files will have "newspk+devExtension" for example
 devExtension='Dev'
 
-
+# the train has utteraneNumber-Test-Dev utterances
 
 # Code 
-
+ct=0
 newfeat=$pathToExport$newfeat
 newspk=$pathToExport$newspk
 newutt=$pathToExport$newutt

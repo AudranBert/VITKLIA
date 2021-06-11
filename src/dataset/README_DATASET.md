@@ -52,3 +52,15 @@ if you want to change parameters, open utterancesSelector.sh.
   * You can also set the path to the orgin files and the path to the exported files (default : blank, so it searchs in the current folder)
   * You can change the number of utterances for dev or test
   * You can change the extension for each subdataset (for train, test and test dataset)
+
+## DatasetInfo
+
+This script gives you informations about a dataset: numbers of speakers, number of utterances, number mean of utterances per speaker...
+
+### How to use it
+
+Launch:
+
+    python datasetInfo.py fileName
+
+FileName is the path of the feats file of your dataset.

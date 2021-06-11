@@ -97,12 +97,14 @@ if __name__ == "__main__":
     yaml_content=readConf(args.conf)
     # for key, value in yaml_content.items():
     #     print(f"{key}: {value}")
-    if mode=="reduction":   # mode  reduction
+    mode=mode.strip("\n")
+    mode=mode.strip()
+    if (mode=="reduction"):   # mode  reduction
         if not os.path.isfile(xvectorsFile):  # check if conf file exist
             errorExit("File : " + xvectorsFile + " does not exist")
-        utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,yaml_content.get("dimension"))
+        utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,int(yaml_content.get("dimension")),yaml_content.get("n_neighbor"),yaml_content.get("min_dist"),yaml_content.get("variableSelectionOption"),yaml_content.get("variablesSelectionNumber"))
         utt,vectors=load(exportReductionFile)
-    elif mode=="read":      # reading mode
+    elif (mode=="read"):      # reading mode
         if not os.path.isfile(readingFile):  # check if conf file exist
             errorExit("File : " + readingFile + " does not exist")
         utt,vectors=load(readingFile)
@@ -111,7 +113,7 @@ if __name__ == "__main__":
     # #print(len(vectors[0]))
     # #prototypes.classify(vectors,utt)
     if yaml_content.get("findProto"):
-        lprototypes,lcriticisms=prototypes.prototypesEachSpeaker(vectors,utt)
+        lprototypes,lcriticisms=prototypes.prototypesEachSpeaker(vectors,utt,yaml_content.get("gridSearch"))
         if (len(vectors[0])==3):    # if 3D vectors
             plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
         else:       # 2D vectors

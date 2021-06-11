@@ -8,7 +8,7 @@ import xvectorsParser
 import umap
 import plotCreator
 import fileReader
-import main
+import run
 
 
 
@@ -27,7 +27,7 @@ def printAll(utt,vectors):
         print(vectors[i])
         print()
 
-def reduce(filePath,fileToExport,dimension):
+def reduce(filePath,fileToExport,dimension,n_neighbor=15,min_dist=0.1,option="",number=0):
     '''
     transform vectors into 2D or 3D vectors
     :param filePath:
@@ -36,28 +36,28 @@ def reduce(filePath,fileToExport,dimension):
     :return embedding:
     '''
     utt,vectors=xvectorsParser.readVectors(filePath)        # read xvectors
-    #lpos = xvectorsParser.getExtent(vectors)
-    #vectors=xvectorsParser.removeVariables(vectors,lpos)
+    if option!="":
+        lpos = xvectorsParser.getExtent(vectors,option,number)
+        vectors=xvectorsParser.removeVariables(vectors,lpos)
+    else:
+        print("no option")
     #printAll(utt,vectors)
     #reducer=umap.UMAP()
     #scaled_vectors = umap.StandardScaler().fit_transform(vectors)
     #embedding = reducer.fit_transform(scaled_vectors)
     print(fileToExport)
-    if (dimension=="2"):
-        embedding=umap.UMAP().fit_transform(vectors)            # transform into 2D
-        #printAll(utt,embedding)
-        fileReader.exportData(utt, embedding, fileToExport)      # save 2D vectors
-        return utt,embedding
-    elif(dimension=="3"):
+    if dimension==2 or dimension==3:
         fit = umap.UMAP(
-            n_components=3,
+            n_components=dimension,
+            n_neighbors=n_neighbor,
+            min_dist=min_dist,
         )
         embedding=fit.fit_transform(vectors)            # transform into 2D
         #printAll(utt,embedding)
         fileReader.exportData(utt, embedding, fileToExport)      # save 2D vectors
         return utt,embedding
     else:
-        main.errorExit("mode must be read or reduction")
+        run.errorExit("dimension must be 2 or 3")
 
 
 

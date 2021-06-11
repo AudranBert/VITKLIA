@@ -96,7 +96,7 @@ def prototypes(vectors,utt,nbPrototypes=2):
 		#print(z)
 	return proto,criti
 
-def prototypesEachSpeaker(vectors,utt):
+def prototypesEachSpeaker(vectors,utt,grid):
 	newutt=classify(vectors,utt)
 	nbPrototypes=len(newutt)
 	z=[]
@@ -141,8 +141,16 @@ def prototypesEachSpeaker(vectors,utt):
 		#print("max :",max, " : ", MMD[max])
 		#print(z)
 		#ct=ct+1
+	if grid:
+		gridSearch(proto,criti)
 	return proto,criti
 
+def gridSearch(proto,crit):
+	sum=0
+	for i in range(len(proto)):
+		sum+=math.dist(proto[i],crit[i])
+	print("Grid search:")
+	print(sum)
 
 if __name__ == "__main__":
 	'''
