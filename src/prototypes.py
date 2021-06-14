@@ -55,8 +55,8 @@ def classify(vectors,utt):
 			newutt.append([])
 			newutt[len(newutt) - 1].append(vectors[ctutt])
 		ctutt += 1
-	for i in newutt:
-		print(i)
+	#for i in newutt:
+	#	print(i)
 	return  newutt
 
 def prototypes(vectors,utt,nbPrototypes=2):
@@ -97,13 +97,14 @@ def prototypes(vectors,utt,nbPrototypes=2):
 	return proto,criti
 
 def prototypesEachSpeaker(vectors,utt,grid):
+	print("Prototypes and criticisms...")
 	newutt=classify(vectors,utt)
 	nbPrototypes=len(newutt)
 	z=[]
 	proto=[]
 	criti=[]
 	#ct=0
-	print("Prototypes and criticisms...")
+
 	for ct in trange(nbPrototypes) :
 		#print("---------------------")
 		MMD=[]

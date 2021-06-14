@@ -8,7 +8,7 @@ sounds_dir: "../resources/sounds"
 # read or reduction
 # read take a file with reducted vectors
 # reduction take a file with embeddings
-mode: "reduction"
+mode: "read"
 
 # reduction properties (mode=reduction)
 # file where the embeddings are
@@ -32,9 +32,9 @@ readingFile: emb2D.txt
 
 # plot properties
 # file to save the plot
-plotFile: "plot/plotM02.jpg"
+plotFile: "plot/plot.jpg"
 # showing the plot or not
-showPlot: False
+showPlot: True
 # size of the dot (default=20) 
 dotSize: 20
 

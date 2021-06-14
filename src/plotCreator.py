@@ -1,11 +1,11 @@
 import os.path
 import re
 import matplotlib.pyplot as plt
-import numpy as np
 from playsound import playsound
 import math
 import wavLink
 import random
+
 s=[]		#sound list
 #s=["../ressources/1.wav","","","",""]
 #for i in range (0,10):
@@ -25,6 +25,7 @@ def playSound(i,xy,sounds):
 		print("The speaker is :",spk[0])
 		if (i <= len(sounds)):  # if a sound exist
 			print(wavLink.getFileWithPathToData(sounds_dir,sounds[i]))
+			print("start")
 			#playsound(s[i])
 
 def find3DCoords(event, ax):
