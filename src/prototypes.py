@@ -4,7 +4,7 @@ import plotCreator
 import fileReader
 import tqdm
 from tqdm import trange
-
+import time
 
 def kernel(i,j):
 	y = 1  # factor to determine ??
@@ -35,7 +35,7 @@ def sum3MMD(x, n):
 			sum=sum+kernel(x[i],x[j])
 	return (1/(n*n))*sum
 
-def classify(vectors,utt):
+def classify(utt,vectors):
 	loc = []
 	newutt = []
 	ctutt = 0
@@ -59,7 +59,7 @@ def classify(vectors,utt):
 	#	print(i)
 	return  newutt
 
-def prototypes(vectors,utt,nbPrototypes=2):
+def prototypes(utt,vectors,nbPrototypes=2):
 
 	z=[]
 	proto=[]
@@ -96,9 +96,10 @@ def prototypes(vectors,utt,nbPrototypes=2):
 		#print(z)
 	return proto,criti
 
-def prototypesEachSpeaker(vectors,utt,grid):
+def prototypesEachSpeaker(utt,vectors,grid):
 	print("Prototypes and criticisms...")
-	newutt=classify(vectors,utt)
+	time.sleep(0.5)
+	newutt=classify(utt,vectors)
 	nbPrototypes=len(newutt)
 	z=[]
 	proto=[]
@@ -133,26 +134,32 @@ def prototypesEachSpeaker(vectors,utt,grid):
 			elif (MMD[max]<MMD[i]  and (newutt[ct][i] not in criti)):
 				max=i
 		if (min!=-1):
-			proto.append(newutt[ct][min])
+			proto.append([ct,min])
 			z.append(newutt[ct][min])
 		if(max!=-1):
-			criti.append(newutt[ct][max])
+			criti.append([ct,max])
 		#print(MMD)
 		#print("min :", min, " : ",MMD[min])
 		#print("max :",max, " : ", MMD[max])
 		#print(z)
 		#ct=ct+1
+	g=0
 	if grid:
-		gridSearch(proto,criti)
-	return proto,criti
+		g=gridSearch(newutt,proto,criti)
+	#print(proto)
+	#print(criti)
+	return proto,criti,g
 
-def gridSearch(proto,crit):
+def gridSearch(newutt,proto,crit):
 	sum=0
 	for i in range(len(proto)):
-		sum+=math.dist(proto[i],crit[i])
+		sum+=math.dist(newutt[proto[i][0]][proto[i][1]],newutt[crit[i][0]][crit[i][1]])
 	print("Grid search:")
-	print(sum)
-
+	g=0
+	if len(proto)!=0:
+		g=sum/len(proto)
+		print(sum/len(proto))
+	return g
 if __name__ == "__main__":
 	'''
 	test only

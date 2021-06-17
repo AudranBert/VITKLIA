@@ -11,8 +11,10 @@ sounds_dir: "../resources/sounds"
 mode: "read"
 
 # reduction properties (mode=reduction)
+# LDA or UMAP or LDA,UMAP
+reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: "xvectors.txt"
+xvectorsFile: xvectors.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
@@ -25,14 +27,20 @@ dimension: 2
 # smaller = more local preservation (default: 15)
 n_neighbor: 15
 # min_dist (default 0.1)
-min_dist: 0.2
+min_dist: 0.1
+# saving the UMAP model
+saveModel: "umapModel"
+# loading the UMAP model
+loadModel: "umapModel"
 
 # no reduction	(mode=read)
 readingFile: emb2D.txt
 
 # plot properties
 # file to save the plot
-plotFile: "plot/plot.jpg"
+plotFile: plot/test.jpg
+# Activate the plot autonaming
+autoNamePlot: False
 # showing the plot or not
 showPlot: True
 # size of the dot (default=20) 
@@ -41,5 +49,7 @@ dotSize: 20
 # prototypes
 # calculate prototypes and criticisms if true
 findProto: True
+# if find proto is true, choose before or after UMAP
+afterReduction: True
 # if find proto is true, calculate the distance between prototypes and criticisms
 gridSearch: True

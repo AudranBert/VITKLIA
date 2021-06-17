@@ -16,6 +16,8 @@ mode="read"
 # reduction
 xvectorsFile=""
 #dimension= "2"
+loadModel=""
+saveModel=""
 exportReductionFile=""
 #reading
 readingFile=""
@@ -65,6 +67,8 @@ def readConf(fileName):
     global filePlotExport
     global showPlot
     global dotSize
+    global saveModel
+    global loadModel
     if not os.path.isfile(fileName):        # check if conf file exist
         errorExit("Conf file : "+fileName+" does not exist")
     yaml_file = open(fileName, 'r')
@@ -81,6 +85,12 @@ def readConf(fileName):
     filePlotExport=yaml_content.get("plotFile")
     sounds=yaml_content.get("sounds_dir")
     resources=yaml_content.get("resources_dir")
+    loadModel=yaml_content.get("loadModel")
+    saveModel = yaml_content.get("saveModel")
+    if loadModel!="":
+        loadModel = resources + os.path.sep + yaml_content.get("loadModel")
+    if saveModel!="":
+        saveModel = resources + os.path.sep + yaml_content.get("saveModel")
     xvectorsFile=resources+os.path.sep+xvectorsFile
     exportReductionFile=resources+os.path.sep+exportReductionFile
     readingFile=resources+os.path.sep+readingFile
@@ -99,10 +109,25 @@ if __name__ == "__main__":
     #     print(f"{key}: {value}")
     mode=mode.strip("\n")
     mode=mode.strip()
+    lprototypes =[]
+    lcriticisms=[]
+    gridSearch=0
     if (mode=="reduction"):   # mode  reduction
         if not os.path.isfile(xvectorsFile):  # check if conf file exist
             errorExit("File : " + xvectorsFile + " does not exist")
-        utt,vectors=reductionVectors.reduce(xvectorsFile,exportReductionFile,int(yaml_content.get("dimension")),yaml_content.get("n_neighbor"),yaml_content.get("min_dist"),yaml_content.get("variableSelectionOption"),yaml_content.get("variablesSelectionNumber"))
+        utt, vectors = xvectorsParser.readVectors(xvectorsFile)  # read xvectors
+        mode = yaml_content.get("reductionMethod").split(",")
+        if (yaml_content.get("findProto") and not(yaml_content.get("afterReduction"))):
+            if "LDA" in mode and "UMAP" in mode :
+                vectors=reductionVectors.ldaMethod(utt,vectors,mode,yaml_content.get("dimension"))
+                i = mode.index("LDA")
+                del mode[i]
+            lprototypes,lcriticisms,gridSearch=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
+            # if "LDA" in mode and "UMAP" not in mode:
+            #     vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
+            #     i = mode.index("LDA")
+            #     del mode[i]
+        utt,vectors=reductionVectors.reduce(utt,vectors,mode,exportReductionFile,int(yaml_content.get("dimension")),yaml_content.get("n_neighbor"),yaml_content.get("min_dist"),saveModel,loadModel,yaml_content.get("variableSelectionOption"),yaml_content.get("variablesSelectionNumber"))
         utt,vectors=load(exportReductionFile)
     elif (mode=="read"):      # reading mode
         if not os.path.isfile(readingFile):  # check if conf file exist
@@ -113,14 +138,33 @@ if __name__ == "__main__":
     # #print(len(vectors[0]))
     # #prototypes.classify(vectors,utt)
     if yaml_content.get("findProto"):
-        lprototypes,lcriticisms=prototypes.prototypesEachSpeaker(vectors,utt,yaml_content.get("gridSearch"))
-        if (len(vectors[0])==3):    # if 3D vectors
+        if (yaml_content.get("afterReduction")):
+            lprototypes,lcriticisms,gridSearch=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
+        if (yaml_content.get("autoNamePlot")):
+            f=yaml_content.get("plotFile").split("/")
+            mode = yaml_content.get("reductionMethod").split(",")
+            s=""
+            if "LDA" in mode and "UMAP" not in mode and yaml_content.get("afterReduction"):
+                s="afterLDA"
+            #elif "LDA" in mode and "UMAP" not in mode and not(yaml_content.get("afterReduction")):
+            #    s="beforeLDA"
+            elif "LDA" not in mode and "UMAP" in mode and not(yaml_content.get("afterReduction")):
+                s="beforeUMAP"
+            elif "LDA" not in mode and "UMAP" in mode and (yaml_content.get("afterReduction")):
+                s="afterUMAP"
+            elif "LDA" in mode and "UMAP" in mode and not(yaml_content.get("afterReduction")):
+                s="afterLDAbeforeUMAP"
+            elif "LDA" in mode and "UMAP" in mode and (yaml_content.get("afterReduction")):
+                s="afterLDAafterUMAP"
+            gridSearch=round(gridSearch,2)
+            filePlotExport=resources+os.path.sep+f[0]+os.path.sep+s+"_"+str(gridSearch)+".jpg"
+        if (len(vectors)>0 and len(vectors[0])==3):    # if 3D vectors
             plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
         else:       # 2D vectors
             plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),sounds)
             #plotCreator.create2DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
     else:
-        if (len(vectors[0])==3):    # if 3D vectors
+        if (len(vectors)>0 and len(vectors[0])==3):   # if 3D vectors
             plotCreator.create3DPlot(vectors,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
         else:       # 2D vectors
             plotCreator.create2DPlot(vectors, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),sounds)

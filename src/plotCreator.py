@@ -113,7 +113,7 @@ def chooseColor(xy,utt):
 		ctutt+=1
 	#for i in newutt:
 	#	print(i)
-	print(len(colors))
+	print("Number of speakers:",len(colors))
 	return colors,newutt
 
 def checkDir(path):
@@ -185,13 +185,15 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 	xp=[]
 	yp=[]
 	for i in prototypes:
-		xp.append(i[0])	# add the utt
-		yp.append(i[1])
+		p=newutt[i[0]][i[1]]
+		xp.append(p[0])	# add the utt
+		yp.append(p[1])
 	xc=[]
 	yc=[]
 	for i in criticisms:
-		xc.append(i[0])	# add the utt
-		yc.append(i[1])
+		c = newutt[i[0]][i[1]]
+		xc.append(c[0])  # add the utt
+		yc.append(c[1])
 	for i in range (0,len(newutt)):
 		ax.scatter(x[i],y[i],s=dotSize,color=colors[i])
 	for i in range (0,len(prototypes)):
@@ -206,6 +208,7 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 	plt.title("PLOT")
 	if checkDir(filePlotExport):
 		plt.savefig(filePlotExport,dpi=1920)
+		print("Plot save to",filePlotExport, )
 	if (show==True):
 		plt.show()
 
