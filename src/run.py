@@ -51,6 +51,27 @@ def errorExit(msg,code=-1):
     print(msg)
     exit(code)
 
+def autoName(plotFile,reductionMethod,intra,inter):
+    f = plotFile.split("/")
+    mode = reductionMethod.split(",")
+    s = ""
+    if "LDA" in mode and "UMAP" not in mode and yaml_content.get("afterReduction"):
+        s = "afterLDA"
+    # elif "LDA" in mode and "UMAP" not in mode and not(yaml_content.get("afterReduction")):
+    #    s="beforeLDA"
+    elif "LDA" not in mode and "UMAP" in mode and not (yaml_content.get("afterReduction")):
+        s = "beforeUMAP"
+    elif "LDA" not in mode and "UMAP" in mode and (yaml_content.get("afterReduction")):
+        s = "afterUMAP"
+    elif "LDA" in mode and "UMAP" in mode and not (yaml_content.get("afterReduction")):
+        s = "afterLDAbeforeUMAP"
+    elif "LDA" in mode and "UMAP" in mode and (yaml_content.get("afterReduction")):
+        s = "afterLDAafterUMAP"
+    gridSearch = round(intra, 2)
+    g2=round(inter, 2)
+    file = resources + os.path.sep + f[0] + os.path.sep + s + "_" + str(gridSearch)+"_"+str(g2) + ".jpg"
+    return file
+
 def readConf(fileName):
     '''
     read the configuration file
@@ -111,7 +132,8 @@ if __name__ == "__main__":
     mode=mode.strip()
     lprototypes =[]
     lcriticisms=[]
-    gridSearch=0
+    gridSearchIntra=0
+    gridSearchInter=0
     if (mode=="reduction"):   # mode  reduction
         if not os.path.isfile(xvectorsFile):  # check if conf file exist
             errorExit("File : " + xvectorsFile + " does not exist")
@@ -122,7 +144,7 @@ if __name__ == "__main__":
                 vectors=reductionVectors.ldaMethod(utt,vectors,mode,yaml_content.get("dimension"))
                 i = mode.index("LDA")
                 del mode[i]
-            lprototypes,lcriticisms,gridSearch=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
+            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
             # if "LDA" in mode and "UMAP" not in mode:
             #     vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
             #     i = mode.index("LDA")
@@ -139,25 +161,9 @@ if __name__ == "__main__":
     # #prototypes.classify(vectors,utt)
     if yaml_content.get("findProto"):
         if (yaml_content.get("afterReduction")):
-            lprototypes,lcriticisms,gridSearch=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
+            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
         if (yaml_content.get("autoNamePlot")):
-            f=yaml_content.get("plotFile").split("/")
-            mode = yaml_content.get("reductionMethod").split(",")
-            s=""
-            if "LDA" in mode and "UMAP" not in mode and yaml_content.get("afterReduction"):
-                s="afterLDA"
-            #elif "LDA" in mode and "UMAP" not in mode and not(yaml_content.get("afterReduction")):
-            #    s="beforeLDA"
-            elif "LDA" not in mode and "UMAP" in mode and not(yaml_content.get("afterReduction")):
-                s="beforeUMAP"
-            elif "LDA" not in mode and "UMAP" in mode and (yaml_content.get("afterReduction")):
-                s="afterUMAP"
-            elif "LDA" in mode and "UMAP" in mode and not(yaml_content.get("afterReduction")):
-                s="afterLDAbeforeUMAP"
-            elif "LDA" in mode and "UMAP" in mode and (yaml_content.get("afterReduction")):
-                s="afterLDAafterUMAP"
-            gridSearch=round(gridSearch,2)
-            filePlotExport=resources+os.path.sep+f[0]+os.path.sep+s+"_"+str(gridSearch)+".jpg"
+            filePlotExport=autoName(yaml_content.get("plotFile"),yaml_content.get("reductionMethod"),gridSearchIntra,gridSearchInter)
         if (len(vectors)>0 and len(vectors[0])==3):    # if 3D vectors
             plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
         else:       # 2D vectors

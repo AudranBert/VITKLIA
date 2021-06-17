@@ -144,22 +144,31 @@ def prototypesEachSpeaker(utt,vectors,grid):
 		#print(z)
 		#ct=ct+1
 	g=0
+	g2=0
 	if grid:
-		g=gridSearch(newutt,proto,criti)
+		g,g2=gridSearch(newutt,proto,criti)
 	#print(proto)
 	#print(criti)
-	return proto,criti,g
+	return proto,criti,g,g2
 
 def gridSearch(newutt,proto,crit):
 	sum=0
 	for i in range(len(proto)):
 		sum+=math.dist(newutt[proto[i][0]][proto[i][1]],newutt[crit[i][0]][crit[i][1]])
 	print("Grid search:")
-	g=0
+	intra=0
 	if len(proto)!=0:
-		g=sum/len(proto)
-		print(sum/len(proto))
-	return g
+		intra=sum/len(proto)
+		print("intra class:",sum/len(proto))
+	sum=0
+	for i in range(len(proto)):
+		for j in range(len(proto)):
+			sum+=math.dist(newutt[proto[i][0]][proto[i][1]],newutt[proto[j][0]][proto[j][1]])
+	inter=0
+	if len(proto)!=0:
+		inter=sum/(len(proto)*len(proto))
+		print("inter class:",sum/(len(proto)*len(proto)))
+	return intra,inter
 if __name__ == "__main__":
 	'''
 	test only
