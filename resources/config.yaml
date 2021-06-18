@@ -12,7 +12,7 @@ mode: "read"
 
 # reduction properties (mode=reduction)
 # LDA or UMAP or LDA,UMAP
-reductionMethod: LDA
+reductionMethod: UMAP
 # file where the embeddings are
 xvectorsFile: xvectors.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
@@ -21,6 +21,7 @@ variableSelectionOption: ""
 variablesSelectionNumber: 20
 # file to store the reducted vectors
 exportReductionFile: emb2DTEST.txt
+
 # UMAP
 # number of dimension
 dimension: 2
@@ -28,10 +29,20 @@ dimension: 2
 n_neighbor: 15
 # min_dist (default 0.1)
 min_dist: 0.1
+# if true load the UMAP model
+loadUmapModel: True
 # saving the UMAP model
-saveModel: "umapModel"
+saveUmapModelFile: "umapModel"
 # loading the UMAP model
-loadModel: "umapModel"
+loadUmapModelFile: "umapModel"
+
+# LDA
+# if true load the LDA model
+loadLdaModel: false
+# saving the LDA model
+saveLdaModelFile: "ldaModel"
+# loading the LDA model
+loadLdaModelFile: "ldaModel"
 
 # no reduction	(mode=read)
 readingFile: emb2D.txt
@@ -43,13 +54,19 @@ plotFile: plot/test.jpg
 autoNamePlot: True
 # showing the plot or not
 showPlot: True
-# size of the dot (default=20) 
-dotSize: 20
+# size of the dot (default=15) 
+dotSize: 10
+# size of the edge of the dot (default=0.5) 
+dotLineWidth: 0.25
+# size of the prototype and the criticism (default=20) 
+protoSize: 25
+# size of the edge of the prototype and the criticism (default=1) 
+protoLineWidth: 1.25
 
 # prototypes
 # calculate prototypes and criticisms if true
 findProto: True
 # if find proto is true, choose before or after UMAP
-afterReduction: true
+afterReduction: false
 # if find proto is true, calculate the distance between prototypes and criticisms
 gridSearch: True

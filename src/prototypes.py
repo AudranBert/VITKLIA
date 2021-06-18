@@ -143,8 +143,8 @@ def prototypesEachSpeaker(utt,vectors,grid):
 		#print("max :",max, " : ", MMD[max])
 		#print(z)
 		#ct=ct+1
-	g=0
-	g2=0
+	g=-1
+	g2=-1
 	if grid:
 		g,g2=gridSearch(newutt,proto,criti)
 	#print(proto)

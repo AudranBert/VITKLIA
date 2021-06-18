@@ -167,10 +167,11 @@ def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsd
 	plt.title("PLOT")
 	if checkDir(filePlotExport):
 		plt.savefig(filePlotExport,dpi=1920)
+		print("Plot save to", filePlotExport)
 	if (show==True):
 		plt.show()
 
-def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
 	setSound(soundsdir)
 	fig, ax = plt.subplots()
 	colors,newutt=chooseColor(xy, utt)
@@ -195,11 +196,11 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 		xc.append(c[0])  # add the utt
 		yc.append(c[1])
 	for i in range (0,len(newutt)):
-		ax.scatter(x[i],y[i],s=dotSize,color=colors[i])
+		ax.scatter(x[i],y[i],s=dotSize,color=colors[i],edgecolors='black',linewidth=dotLineWidth)
 	for i in range (0,len(prototypes)):
-		ax.scatter(xp[i], yp[i], s=(dotSize*0.9), marker="D",color='black')
+		ax.scatter(xp[i], yp[i], color=colors[i],s=protoSize, marker="D",edgecolors='black',linewidth=protoLineWidth)
 	for i in range (0,len(criticisms)):
-		ax.scatter(xc[i], yc[i], s=(dotSize*0.9), marker="^",color='black')
+		ax.scatter(xc[i], yc[i],color=colors[i], s=protoSize, marker="^",edgecolors='black',linewidth=protoLineWidth)
 		#plt.clabel(ax,colors='blue')
 	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2D(event,ax,xy,utt))
 	plt.xlabel("X")
@@ -208,11 +209,11 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 	plt.title("PLOT")
 	if checkDir(filePlotExport):
 		plt.savefig(filePlotExport,dpi=1920)
-		print("Plot save to",filePlotExport, )
+		print("Plot save to",filePlotExport )
 	if (show==True):
 		plt.show()
 
-def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
 	setSound(soundsdir)
 	fig = plt.figure()
 	colors, newutt = chooseColor(xyz, utt)
@@ -231,25 +232,27 @@ def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExpo
 	yp=[]
 	zp=[]
 	for i in prototypes:
-		xp.append(i[0])	# add the utt
-		yp.append(i[1])
-		zp.append(i[2])
+		p = newutt[i[0]][i[1]]
+		xp.append(p[0])	# add the utt
+		yp.append(p[1])
+		zp.append(p[2])
 	xc=[]
 	yc=[]
 	zc=[]
 	for i in criticisms:
-		xc.append(i[0])	# add the utt
-		yc.append(i[1])
-		zc.append(i[2])
+		c = newutt[i[0]][i[1]]
+		xc.append(c[0])	# add the utt
+		yc.append(c[1])
+		zc.append(c[2])
 	ax = fig.add_subplot(projection='3d')
 	### place the points
 	for i in range (0,len(newutt)):
-		ax.scatter(x[i],y[i],z[i],s=dotSize,color=colors[i])
+		ax.scatter(x[i],y[i],z[i],s=dotSize,color=colors[i],edgecolors='black',linewidth=dotLineWidth)
 	###
 	for i in range (0,len(prototypes)):
-		ax.scatter(xp[i], yp[i],zp[i], s=(dotSize*1.1), marker="D",color='black')
+		ax.scatter(xp[i], yp[i],zp[i], s=(dotSize*1.1), marker="D",edgecolors='black',linewidth=protoLineWidth)
 	for i in range (0,len(criticisms)):
-		ax.scatter(xc[i], yc[i],zc[i], s=(dotSize*1.1), marker="^",color='black')
+		ax.scatter(xc[i], yc[i],zc[i], s=(dotSize*1.1), marker="^",edgecolors='black',linewidth=protoLineWidth)
 	# bind press event with onclick function
 	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick3D(event,ax,xyz,utt))
 	# plot labelling
@@ -260,6 +263,7 @@ def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExpo
 	plt.title("PLOT")
 	if checkDir(filePlotExport):
 		plt.savefig(filePlotExport,dpi=1920)
+		print("Plot save to", filePlotExport)
 	if (show==True):
 		plt.show()
 
@@ -304,6 +308,7 @@ def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,sounds
 	plt.title("PLOT")
 	if checkDir(filePlotExport):
 		plt.savefig(filePlotExport,dpi=1920)
+		print("Plot save to", filePlotExport)
 	if (show==True):
 		plt.show()
 
