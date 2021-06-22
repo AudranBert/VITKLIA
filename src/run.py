@@ -72,9 +72,9 @@ def autoName(plotFile,dimension,reductionMethod,intra,inter):
     gridSearch = round(intra, 2)
     g2=round(inter, 2)
     if intra==-1:
-        file = resources + os.path.sep + f[0] + os.path.sep +str(dimension)+"D"+"_"+ s + ".jpg"
+        file = resources + os.path.sep + f[0] + os.path.sep +str(dimension)+"D"+"_"+ yaml_content.get("kernel")+"_"+ s + ".jpg"
     else:
-        file = resources + os.path.sep + f[0] + os.path.sep +str(dimension)+"D"+"_"+ s + "_" + str(gridSearch)+"_"+str(g2) + ".jpg"
+        file = resources + os.path.sep + f[0] + os.path.sep +str(dimension)+"D"+"_"+yaml_content.get("kernel")+"_"+ s + "_" + str(gridSearch)+"_"+str(g2) + ".jpg"
     return file
 
 def readConf(fileName):
@@ -157,7 +157,7 @@ if __name__ == "__main__":
                 vectors=reductionVectors.ldaMethod(utt,vectors,mode,yaml_content.get("dimension"))
                 i = mode.index("LDA")
                 del mode[i]
-            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
+            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"),yaml_content.get("kernel"))
             # if "LDA" in mode and "UMAP" not in mode:
             #     vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
             #     i = mode.index("LDA")
@@ -177,7 +177,7 @@ if __name__ == "__main__":
         dimension = 3
     if yaml_content.get("findProto"):
         if (yaml_content.get("afterReduction")):
-            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"))
+            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"),yaml_content.get("kernel"))
         if (yaml_content.get("autoNamePlot")):
             filePlotExport=autoName(yaml_content.get("plotFile"),dimension,yaml_content.get("reductionMethod"),gridSearchIntra,gridSearchInter)
         if (len(vectors)>0 and dimension==3):    # if 3D vectors

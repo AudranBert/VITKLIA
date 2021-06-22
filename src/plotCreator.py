@@ -1,4 +1,6 @@
 import os.path
+import pyaudio
+import wave
 import re
 import matplotlib.pyplot as plt
 from playsound import playsound
@@ -12,6 +14,30 @@ s=[]		#sound list
 #	s.append("../ressources/sounds/1.wav")
 
 sounds_dir=""
+alreadyStarted=False
+stream=None
+wf=None
+p=None
+
+def callback(in_data, frame_count, time_info, status):
+    data = wf.readframes(frame_count)
+    return (data, pyaudio.paContinue)
+
+def pyAudioStarting(file):
+	global stream
+	global wf
+	global p
+	print("start")
+	wf = wave.open(file, 'rb')
+	p = pyaudio.PyAudio()
+	stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+					channels=wf.getnchannels(),
+					rate=wf.getframerate(),
+					output=True,
+					stream_callback=callback
+					)
+	stream.start_stream()
+
 
 def setSound(dir):
 	global sounds_dir
@@ -19,14 +45,27 @@ def setSound(dir):
 
 
 def playSound(i,xy,sounds):
+	global stream
+	global wf
+	global p
 	if (i >= 0):  # if a point have been found
 		spk=sounds[i].split("-")
 		print("The point is :", xy[i])
 		print("The speaker is :",spk[0])
+		if stream!=None:
+			# stop stream
+			stream.stop_stream()
+			stream.close()
+			wf.close()
+			# close PyAudio
+			p.terminate()
+			print("stop")
 		if (i <= len(sounds)):  # if a sound exist
 			print(wavLink.getFileWithPathToData(sounds_dir,sounds[i]))
-			print("start")
+
+
 			#playsound(s[i])
+		pyAudioStarting("../resources/sounds/1.wav")
 
 def find3DCoords(event, ax):
 	pressed = ax.button_pressed

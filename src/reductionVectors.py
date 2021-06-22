@@ -23,10 +23,10 @@ def ldaMethod(utt,vectors,mode,dimension,load=False,saveModel="",loadModel=""):
                     index = j
                     break
             y.append(index)
-        if load and loadModel!="":
+        if load and os.path.isfile(loadModel):
             loaded_model = pickle.load((open(loadModel, 'rb')))
             print("LDA model:",loadModel, "has been loaded")
-            embedding = loaded_model.fit_transform(vectors,y)
+            embedding = loaded_model.transform(vectors)
         else:
             lda=LinearDiscriminantAnalysis(
                 n_components=dimension
@@ -46,10 +46,10 @@ def ldaMethod(utt,vectors,mode,dimension,load=False,saveModel="",loadModel=""):
                     index = j
                     break
             y.append(index)
-        if load and loadModel!="":
+        if load and os.path.isfile(loadModel):
             loaded_model = pickle.load((open(loadModel, 'rb')))
             print("LDA model:",loadModel, "has been loaded")
-            embedding = loaded_model.fit_transform(vectors,y)
+            embedding = loaded_model.transform(vectors)
         else:
             lda=LinearDiscriminantAnalysis(
             )
@@ -62,10 +62,10 @@ def ldaMethod(utt,vectors,mode,dimension,load=False,saveModel="",loadModel=""):
 def umapMethod(vectors,dimension,n_neighbor,min_dist,load,saveModel,loadModel):
     embedding=[]
     print("UMAP reduction")
-    if load and loadModel!="":
+    if load and os.path.isfile(loadModel):
         loaded_model = pickle.load((open(loadModel, 'rb')))
         print("UMAP model:",loadModel, "has been loaded")
-        embedding=loaded_model.fit_transform(vectors)
+        embedding=loaded_model.transform(vectors)
     else:
         reducer = umap.UMAP(
             n_components=dimension,

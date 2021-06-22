@@ -5,19 +5,33 @@ import fileReader
 import tqdm
 from tqdm import trange
 import time
+import numpy as np
+
+kernelMode="cosinus"
 
 def kernel(i,j):
 	y = 1  # factor to determine ??
+	return np.dot(i,j)/(np.linalg.norm(i)*np.linalg.norm(j))
+
+def kernelTest(i,j):
+	y = 1  # factor to determine ??
+	return math.exp(-1 * y *np.dot(i,j)/(np.linalg.norm(i)*np.linalg.norm(j)))
+
+def kernelEuclidienne(i,j):
+	y = 1  # factor to determine ??
 	return math.exp(-1 * y * math.dist(i, j))
-
-
 
 def sum1MMD(z, m):
 	sum=0
 	for i in range(0,m):
 		for j in range (0,m):
 			#if (i<len(z) and j<len(z)):
-			sum=sum+kernel(z[i],z[j])
+			if kernelMode=="cosinus":
+				sum=sum+kernel(z[i],z[j])
+			elif kernelMode=="test":
+				sum = sum + kernelTest(z[i], z[j])
+			else:
+				sum = sum + kernelEuclidienne(z[i], z[j])
 	return (1/(m*m))*sum
 
 def sum2MMD(z, x, m, n):
@@ -25,14 +39,24 @@ def sum2MMD(z, x, m, n):
 	for i in range(0,m):
 		for j in range (0,n):
 			#if (i < len(z)):
-			sum=sum+kernel(z[i],x[j])
+			if kernelMode=="cosinus":
+				sum=sum+kernel(z[i],x[j])
+			elif kernelMode == "test":
+				sum = sum + kernelTest(z[i], x[j])
+			else:
+				sum = sum + kernelEuclidienne(z[i], x[j])
 	return (2/(m*n))*sum
 
 def sum3MMD(x, n):
 	sum=0
 	for i in range(0,n):
 		for j in range (0,n):
-			sum=sum+kernel(x[i],x[j])
+			if kernelMode=="cosinus":
+				sum=sum+kernel(x[i],x[j])
+			elif kernelMode=="test":
+				sum = sum + kernelTest(x[i], x[j])
+			else:
+				sum = sum + kernelEuclidienne(x[i], x[j])
 	return (1/(n*n))*sum
 
 def classify(utt,vectors):
@@ -96,7 +120,9 @@ def prototypes(utt,vectors,nbPrototypes=2):
 		#print(z)
 	return proto,criti
 
-def prototypesEachSpeaker(utt,vectors,grid):
+def prototypesEachSpeaker(utt,vectors,grid,kernelM):
+	global kernelMode
+	kernelMode=kernelM
 	print("Prototypes and criticisms...")
 	time.sleep(0.5)
 	newutt=classify(utt,vectors)
@@ -109,10 +135,11 @@ def prototypesEachSpeaker(utt,vectors,grid):
 	for ct in trange(nbPrototypes) :
 		#print("---------------------")
 		MMD=[]
+		sum3=sum3MMD(newutt[ct], len(newutt[ct]))
 		for i in range(len(newutt[ct])):
 			z.append(newutt[ct][i])
 			#print(z)
-			mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newutt[ct], len(z), len(newutt[ct])) + sum3MMD(newutt[ct], len(newutt[ct]))
+			mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newutt[ct], len(z), len(newutt[ct])) + sum3
 			#print(sum1MMD(z, nbPrototypes))
 			# if(i>60):
 			# 	print("--------------")
@@ -125,14 +152,10 @@ def prototypesEachSpeaker(utt,vectors,grid):
 		min = -1
 		max=-1
 		for i in range (0,len(MMD)):
-			if (min==-1  and  (newutt[ct][i] not in proto)):
+			if ((min==-1 or MMD[min]>MMD[i])  and  (newutt[ct][i] not in proto)):
 				min = i
-			elif (MMD[min]>MMD[i]  and (newutt[ct][i] not in proto)):
-				min=i
-			if (max==-1  and  (newutt[ct][i] not in criti)):
+			if ((max==-1 or MMD[max]<MMD[i]) and  (newutt[ct][i] not in criti)):
 				max = i
-			elif (MMD[max]<MMD[i]  and (newutt[ct][i] not in criti)):
-				max=i
 		if (min!=-1):
 			proto.append([ct,min])
 			z.append(newutt[ct][min])

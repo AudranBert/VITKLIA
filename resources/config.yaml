@@ -8,7 +8,7 @@ sounds_dir: "../resources/sounds"
 # read or reduction
 # read take a file with reducted vectors
 # reduction take a file with embeddings
-mode: "read"
+mode: "reduction"
 
 # reduction properties (mode=reduction)
 # LDA or UMAP or LDA,UMAP
@@ -30,7 +30,7 @@ n_neighbor: 15
 # min_dist (default 0.1)
 min_dist: 0.1
 # if true load the UMAP model
-loadUmapModel: True
+loadUmapModel: false
 # saving the UMAP model
 saveUmapModelFile: "umapModel"
 # loading the UMAP model
@@ -38,7 +38,7 @@ loadUmapModelFile: "umapModel"
 
 # LDA
 # if true load the LDA model
-loadLdaModel: false
+loadLdaModel: true
 # saving the LDA model
 saveLdaModelFile: "ldaModel"
 # loading the LDA model
@@ -67,6 +67,8 @@ protoLineWidth: 1.25
 # calculate prototypes and criticisms if true
 findProto: True
 # if find proto is true, choose before or after UMAP
-afterReduction: false
+afterReduction: true
+# define the distance calculation
+kernel: euclidienne
 # if find proto is true, calculate the distance between prototypes and criticisms
 gridSearch: True
