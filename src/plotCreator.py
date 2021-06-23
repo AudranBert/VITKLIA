@@ -17,7 +17,10 @@ sounds_dir=""
 alreadyStarted=False
 stream=None
 wf=None
-p=None
+paudio=None
+
+plot=None
+
 
 def callback(in_data, frame_count, time_info, status):
     data = wf.readframes(frame_count)
@@ -26,11 +29,11 @@ def callback(in_data, frame_count, time_info, status):
 def pyAudioStarting(file):
 	global stream
 	global wf
-	global p
+	global paudio
 	print("start")
 	wf = wave.open(file, 'rb')
-	p = pyaudio.PyAudio()
-	stream = p.open(format=p.get_format_from_width(wf.getsampwidth()),
+	paudio = pyaudio.PyAudio()
+	stream = paudio.open(format=paudio.get_format_from_width(wf.getsampwidth()),
 					channels=wf.getnchannels(),
 					rate=wf.getframerate(),
 					output=True,
@@ -58,14 +61,29 @@ def playSound(i,xy,sounds):
 			stream.close()
 			wf.close()
 			# close PyAudio
-			p.terminate()
+			paudio.terminate()
 			print("stop")
 		if (i <= len(sounds)):  # if a sound exist
 			print(wavLink.getFileWithPathToData(sounds_dir,sounds[i]))
-
-
 			#playsound(s[i])
-		pyAudioStarting("../resources/sounds/1.wav")
+		#pyAudioStarting("../resources/sounds/1.wav")
+		rePlot(spk[0],i,xy)
+
+def rePlot(spk,id,xy):
+	# if theplot!=None:
+	# 	plt.clf()
+	# 	fig, ax = plt.subplots()
+	# 	plt.scatter([1,2,3], [4,5,6])
+	# 	plt.title("Figure 2 cleared with clf()")
+	# 	plt.show()
+	plot.clf()
+	fig=plot.gcf()
+	ax=fig.add_subplot()
+	ax.scatter(xy[id][0], xy[id][1])
+	title="Speaker :"+str(spk)
+	plot.title(title)
+	fig.canvas.draw_idle()
+	plot.show()
 
 def find3DCoords(event, ax):
 	pressed = ax.button_pressed
@@ -78,6 +96,7 @@ def find3DCoords(event, ax):
 	return res
 
 def onclick2D(event,ax,xy,sounds):		#click on the plot
+	global plot
 	if event.inaxes!=None:	#inside the plot
 		print("The click : ",event.xdata," ",event.ydata)
 		point=-1
@@ -121,6 +140,7 @@ def onclick3D(event,ax,xyz,sounds):		#click on the plot
 				else:
 					point=i
 		playSound(point,xyz,sounds)
+
 
 def chooseColor(xy,utt):
 	colors=[]
@@ -208,11 +228,14 @@ def create2DPlot(xy,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsd
 		plt.savefig(filePlotExport,dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show==True):
-		plt.show()
+		plt.show(block=False)
 
 def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
+	global plot
 	setSound(soundsdir)
-	fig, ax = plt.subplots()
+	plot=plt
+	#plot.ion()
+	fig, ax = plot.subplots()
 	colors,newutt=chooseColor(xy, utt)
 	x=[]
 	y=[]
@@ -221,7 +244,7 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 		y.append([])
 		for j in i:
 			x[len(x)-1].append(j[0])	# add the utt
-			y[len(y)-1].append(j[1])
+			y[len(x)-1].append(j[1])
 	xp=[]
 	yp=[]
 	for i in prototypes:
@@ -242,15 +265,17 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt,show=False,filePlotExpor
 		ax.scatter(xc[i], yc[i],color=colors[i], s=protoSize, marker="^",edgecolors='black',linewidth=protoLineWidth)
 		#plt.clabel(ax,colors='blue')
 	cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2D(event,ax,xy,utt))
-	plt.xlabel("X")
-	plt.ylabel("Y")
-	plt.legend(loc='upper left')
-	plt.title("PLOT")
+	plot.xlabel("X")
+	plot.ylabel("Y")
+	#plot.legend(loc='upper left')
+	plot.title("PLOT")
+
 	if checkDir(filePlotExport):
-		plt.savefig(filePlotExport,dpi=1920)
+		plot.savefig(filePlotExport,dpi=1920)
 		print("Plot save to",filePlotExport )
+	#plot.ioff()
 	if (show==True):
-		plt.show()
+	 	plot.show()
 
 def create3DPlotPrototypes(xyz,prototypes,criticisms,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
 	setSound(soundsdir)

@@ -51,7 +51,7 @@ readingFile: emb2D.txt
 # file to save the plot
 plotFile: plot/test.jpg
 # Activate the plot autonaming
-autoNamePlot: True
+autoNamePlot: false
 # showing the plot or not
 showPlot: True
 # size of the dot (default=15) 
