@@ -1,5 +1,5 @@
 import os.path
-import pyaudio
+#import pyaudio
 import wave
 import re
 import matplotlib.pyplot as plt
@@ -115,7 +115,7 @@ def onclick2D(event,ax,xy,sounds):		#click on the plot
 						point=i
 				else:
 					point=i
-		playSound(point,xy,sounds)
+		#playSound(point,xy,sounds)
 
 	
 def onclick3D(event,ax,xyz,sounds):		#click on the plot

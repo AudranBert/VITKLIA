@@ -14,7 +14,7 @@ mode: "reduction"
 # LDA or UMAP or LDA,UMAP
 reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: xvectors.txt
+xvectorsFile: xvectorsTrainOld.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
@@ -51,7 +51,7 @@ readingFile: emb2D.txt
 # file to save the plot
 plotFile: plot/test.jpg
 # Activate the plot autonaming
-autoNamePlot: false
+autoNamePlot: true
 # showing the plot or not
 showPlot: True
 # size of the dot (default=15) 
@@ -67,7 +67,7 @@ protoLineWidth: 1.25
 # calculate prototypes and criticisms if true
 findProto: True
 # if find proto is true, choose before or after UMAP
-afterReduction: true
+afterReduction: false
 # define the distance calculation
 kernel: euclidienne
 # if find proto is true, calculate the distance between prototypes and criticisms
