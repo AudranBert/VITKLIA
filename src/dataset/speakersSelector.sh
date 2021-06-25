@@ -2,18 +2,8 @@
 
 # Parameters
 
-# path where the new dataset will be
-pathToExport='Out/'
-
 # path where the dataset is
-pathToOrigin=''
-
-# name of the new spk2utt file
-newspk='spk2utt'
-# name of the new feats.scp file
-newfeat='feats.scp'
-# name of the new utt2spk file
-newutt='utt2spk'
+pathToOrigin='../../resources/dataset/'
 
 # name of the feats file where we take utterances
 feats='featsOrigin.scp'
@@ -22,28 +12,48 @@ spk2utt='spk2uttOrigin'
 # name of the utt2spk file
 utt2spk='utt2spkOrigin'
 
-# number of speakers in the new dataset
-speakerNumber=50
+# Export
 
-# create a test dataset
-createATestDataSet=True
-# if true how many speakers
-speakerTestNumber=$((speakerNumber/10))
-# test files will have "newspk+testExtension" for example
+# path where the new dataset will be
+pathToExport='../../resources/dataset/Out/'
+
+# name of the new spk2utt file
+newspk='spk2utt'
+# name of the new feats.scp file
+newfeat='feats.scp'
+# name of the new utt2spk file
+newutt='utt2spk'
+
+# number of speakers in the train dataset
+speakerTrainNumber=50
+# folder for the new train dataset (no "/" at the end)
+trainExtension='Train'
+
+# number of test dataset
+testDatasetNumber=5
+# number of speakers in the test
+speakerTestNumber=50
+# folder for the new test dataset (no "/" at the end)
 testExtension='Test'
 
+# End parameters
 
 
 # Code 
 ct=0
 
-newfeat=$pathToExport$newfeat
-newspk=$pathToExport$newspk
-newutt=$pathToExport$newutt
+newfeatTrain="${pathToExport}${trainExtension}/${newfeat}"
+newspkTrain="${pathToExport}${trainExtension}/${newspk}"
+newuttTrain="${pathToExport}${trainExtension}/${newutt}"
 
 feats=$pathToOrigin$feats
 spk2utt=$pathToOrigin$spk2utt
 utt2spk=$pathToOrigin$utt2spk
+
+if [ ! -d $pathToExport ] 
+then
+	mkdir $pathToExport
+fi
 
 
 if [ -f "$newspk" ];
@@ -65,18 +75,45 @@ then
 newspk=$newspk$ct
 fi
 
+if [ ! -d $pathToExport$trainExtension ] 
+then
+	mkdir $pathToExport$trainExtension
+fi
 
-
-cat $spk2utt | shuf | head -n $speakerNumber > $newspk
+speakerNumber=$(((speakerTestNumber*testDatasetNumber)+(speakerTrainNumber)))
+cat $spk2utt | shuf | head -n $speakerNumber > tmpSpk
 
 
 echo "Get utterances :"
-python3 featSelector.py False $newspk $newfeat $newutt $feats $utt2spk $ct
+cat tmpSpk | head -n $speakerTrainNumber > $newspkTrain
+tail -n +$((speakerTrainNumber+1)) tmpSpk > tmp
+cp -f tmp tmpSpk
+python3 speakersSelector.py False $newspkTrain $newfeatTrain $newuttTrain $feats $utt2spk $ct
 
-if [ "$createATestDataSet" ];
-then
-	testspk=${newspk}${testExtension}
-	cat $newspk | shuf | head -n $speakerTestNumber > $testspk
+
+
+i=1
+testExtension="${pathToExport}${testExtension}"
+while [ $i -le $testDatasetNumber ]
+do
+        testspk="${testExtension}${i}/${newspk}"
+        if [ ! -d ${testExtension}${i} ] 
+	then
+		mkdir ${testExtension}${i}
+	fi
+	ext="${testExtension}${i}/"
+        i=$((i+1))
+	cat tmpSpk | head -n $speakerTestNumber > $testspk
+	tail -n +$((speakerTestNumber+1)) tmpSpk > tmp
+	cp -f tmp tmpSpk
 	echo "Get Test utterances :"
-	python3 speakersSelector.py True $testspk $newfeat $newutt $newfeat $utt2spk $ct $testExtension
-fi	
+	
+	python3 speakersSelector.py True $testspk $newfeat $newutt $feats $utt2spk $ct $ext
+done
+
+rm tmp
+rm tmpSpk
+
+
+
+

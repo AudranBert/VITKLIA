@@ -9,14 +9,14 @@ oldutt = ""
 oldspk = ""
 
 
-def testDataset(newspk, newFeat, newutt, feat, spk):
-    if (os.path.isfile(newspk) and os.path.isfile(feat)):  # check if files exist
-        print(feat)
+def testDataset(newspk, newFeat, newutt, oldfeat, oldspk):
+    if (os.path.isfile(newspk) and os.path.isfile(oldfeat)):  # check if files exist
+        print(oldfeat)
         print(newFeat)
         print(newutt)
         print("FILES FOUND")
         print(newspk)
-        rm = open(spk, "r")
+        rm = open(oldspk, "r")
         rmFromSpk = []
         for i in rm:
             s = i.strip("\n")
@@ -89,8 +89,8 @@ def trainDataset(newspk, newFeat, newutt, feat, test="False"):
             idSpeaker.append(s[0])
         out.close()
         feats = open(feat, "r")
-        result = open(newFeat, "w")
-        newspkFile = open(newutt, "w")
+        result = open(newFeat, "w+")
+        newspkFile = open(newutt, "w+")
         ct = 0
         for line in feats:  # for each lines of feats
             s = line.strip("\n")
@@ -110,8 +110,8 @@ def trainDataset(newspk, newFeat, newutt, feat, test="False"):
         feats.close()
         result.close()
         newspkFile.close()
-        if test == "True":
-            testDataset(oldspk, oldfeat, oldutt, newFeat, newspk)
+       
+            
         print("Finished :", newFeat)
     else:
         print("NO FILE")
@@ -184,7 +184,7 @@ if __name__ == "__main__":
     #             ct+=1
     #         newFeat=n[0]+str(ct)+"."+n[1]
 
-    if (ct != 0):  # file numbering
+    if (ct == -10):  # file numbering
         if test == "True":
             n = newFeat.split(".")
             if len(n) == 2:
@@ -209,16 +209,18 @@ if __name__ == "__main__":
                 newutt = n[0] + str(ct)
     else:
         if test == "True":
-            n = newFeat.split(".")
-            if len(n) == 2:
-                newFeat = n[0] + testExtension + "." + n[1]
-            else:
-                newFeat = n[0] + testExtension
-            n = newutt.split(".")
-            if len(n) == 2:
-                newutt = n[0] + testExtension + "." + n[1]
-            else:
-                newutt = n[0] + testExtension
+        	newFeat=testExtension+newFeat
+        	newutt=testExtension+newutt
+            #n = newFeat.split(".")
+            #if len(n) == 2:
+            #    newFeat = n[0] + testExtension + "." + n[1]
+            #else:
+            #    newFeat = n[0] + testExtension
+            #n = newutt.split(".")
+            #if len(n) == 2:
+            #    newutt = n[0] + testExtension + "." + n[1]
+            #else:
+            #    newutt = n[0] + testExtension
     print("feat: ", feat)
     print(newspk)
     print(newFeat)

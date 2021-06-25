@@ -4,7 +4,7 @@ The goal is to create a smaller dataset with voxeceleb's speakers.
 
 ## Two possibilities
 
-You can use a number of speaker or a number of utterance. Each one is a different script.
+You can use a number of speakers or a number of utterances. Each one is a different script.
 
 ## SpeakerSelector
 
@@ -21,12 +21,14 @@ Simply launch :
 
 if you want to change parameters, open speakersSelector.sh.
 
-  * You can change the number of speakers by changing "speakerNumber" (default value : 50) 
+
+  * You can also set the path to the origin files and the path to the exported files (default : blank, so it searchs in the current folder)
   * You can change the name of origin files and new files (there are default values for each)
-  * You can also set the path to the orgin files and the path to the exported files (default : blank, so it searchs in the current folder)
-  * You can ask for the creation of a test dataset by changing createATestDataSet to True
-  * If the previus conf is at True you can select the number of speakers for the test dataset
-  * You can also select the extension of the files
+  * You can change the number of speakers in the train by changing "speakerTrainNumber" (default value : 50) 
+  * You can set the folder where you want your train dataset
+  * You can change the number of test dataset by changing "testDatasetNumber"
+  * You can change the number of speakers for test dataset by changing "speakerTestNumber"
+  * You can set the folder where you want your test dataset
 
 ## UtteranceSelector
 
@@ -39,19 +41,11 @@ Simply launch :
     bash utterancesSelector.sh
 
 
-It will create feat file for dev train and test.
-Same for the spk2utt file and the utt2spk file.
-Si it will create 9 files.
-
 ### Configuration
 
 if you want to change parameters, open utterancesSelector.sh.
 
-  * You can change the number of speakers by changing "utteranceNumber" (default value : 50) 
-  * You can change the name of origin files and new files (there are default values for each)
-  * You can also set the path to the orgin files and the path to the exported files (default : blank, so it searchs in the current folder)
-  * You can change the number of utterances for dev or test
-  * You can change the extension for each subdataset (for train, test and test dataset)
+There are the same as the speakerSelector.
 
 ## DatasetInfo
 
@@ -63,4 +57,4 @@ Launch:
 
     python datasetInfo.py fileName
 
-FileName is the path of the feats file of your dataset.
+FileName is the path of the feats.scp file of your dataset.

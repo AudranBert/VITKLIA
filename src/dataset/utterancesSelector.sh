@@ -2,18 +2,8 @@
 
 # Parameters
 
-# path where the new dataset will be
-pathToExport='Out/'
-
 # path where the dataset is
-pathToOrigin=''
-
-# name of the new spk2utt file
-newspk='spk2utt'
-# name of the new feats.scp file
-newfeat='feats'
-# name of the new utt2spk file
-newutt='utt2spk'
+pathToOrigin='../../resources/dataset/'
 
 # name of the feats file where we take utterances
 feats='featsOrigin.scp'
@@ -22,33 +12,47 @@ spk2utt='spk2uttOrigin'
 # name of the utt2spk file
 utt2spk='utt2spkOrigin'
 
-# numer of total utterances 
-utteranceNumber=50
+# Export
 
-# train files will have "newspk+trainExtension" for example
+# path where the new dataset will be
+pathToExport='../../resources/dataset/Out/'
+
+# name of the new spk2utt file
+newspk='spk2utt'
+# name of the new feats.scp file
+newfeat='feats.scp'
+# name of the new utt2spk file
+newutt='utt2spk'
+
+# number of utterances in the train dataset
+utteranceTrainNumber=5000
+# folder for the new train dataset (no "/" at the end)
 trainExtension='Train'
 
+# number of test dataset
+testDatasetNumber=5
 # number of utterances in the test
-utteranceTestNumber=$(( utteranceNumber / 5 ))
-# test files will have "newspk+testExtension" for example
+utteranceTestNumber=5000
+# folder for the new test dataset (no "/" at the end)
 testExtension='Test'
 
-# number of utterances in the dev
-utteranceDevNumber=$(( utteranceNumber / 10 ))
-# dev files will have "newspk+devExtension" for example
-devExtension='Dev'
 
-# the train has utteraneNumber-Test-Dev utterances
+# End parameters
 
 # Code 
 ct=0
-newfeat=$pathToExport$newfeat
-newspk=$pathToExport$newspk
-newutt=$pathToExport$newutt
+newfeatTrain="${pathToExport}${trainExtension}/${newfeat}"
+newspkTrain="${pathToExport}${trainExtension}/${newspk}"
+newuttTrain="${pathToExport}${trainExtension}/${newutt}"
 
 feats=$pathToOrigin$feats
 spk2utt=$pathToOrigin$spk2utt
 utt2spk=$pathToOrigin$utt2spk
+
+if [ ! -d $pathToExport ] 
+then
+	mkdir $pathToExport
+fi
 
 if [ -f "$newfeat" ];
 then
@@ -69,16 +73,43 @@ then
 newfeat=$newfeat$ct
 fi
 
+if [ ! -d $pathToExport$trainExtension ] 
+then
+	mkdir $pathToExport$trainExtension
+fi
+
+utteranceNumber=$(((utteranceTestNumber*testDatasetNumber)+(utteranceTrainNumber)))
+cat $feats | shuf | head -n $utteranceNumber > tmpFeat
+
+cat tmpFeat | head -n $utteranceTrainNumber > $newfeatTrain
+tail -n +$((utteranceTrainNumber+1)) tmpFeat > tmp
+cp -f tmp tmpFeat
+python3 uttSelector.py $newspkTrain $newuttTrain $newfeatTrain
 
 
-cat $feats | shuf | head -n $utteranceNumber > $newfeat$trainExtension
+i=1
+testExtension="${pathToExport}${testExtension}"
+while [ $i -le $testDatasetNumber ]
+do
+        testFeat="${testExtension}${i}/${newfeat}"
+        testSpk="${testExtension}${i}/${newspk}"
+        testUtt="${testExtension}${i}/${newutt}"
+        if [ ! -d ${testExtension}${i} ] 
+	then
+		mkdir ${testExtension}${i}
+	fi
+        i=$((i+1))
+	cat tmpFeat | head -n $utteranceTestNumber > $testFeat
+	tail -n +$((utteranceTestNumber+1)) tmpFeat > tmp
+	cp -f tmp tmpFeat
+	echo "Get Test utterances :"
+	python3 uttSelector.py $testSpk $testUtt $testFeat
+done
 
-cat $newfeat$trainExtension | head -n $utteranceDevNumber > $newfeat$devExtension
-tail -n +$((utteranceDevNumber+1)) $newfeat$trainExtension > tmp
-cat tmp | head -n $utteranceTestNumber > $newfeat$testExtension
-tail -n +$((utteranceTestNumber+1)) tmp > $newfeat$trainExtension
 rm tmp
+rm tmpFeat
 
-python3 uttSelector.py $newspk$trainExtension $newutt$trainExtension $newfeat$trainExtension
-python3 uttSelector.py $newspk$testExtension $newutt$testExtension $newfeat$testExtension
-python3 uttSelector.py $newspk$devExtension $newutt$devExtension $newfeat$devExtension
+
+
+
+
