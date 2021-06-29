@@ -1,6 +1,7 @@
 # resources
 # folder where the program search files
 resources_dir: ../resources
+export_dir: files
 # folder where the program search sounds 
 sounds_dir: "../resources/sounds"
 
@@ -14,7 +15,7 @@ mode: "reduction"
 # LDA or UMAP or LDA,UMAP
 reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: xvectorsTrainOld.txt
+xvectorsFile: /dataset/Spk/train_data/xvectors.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
@@ -30,7 +31,7 @@ n_neighbor: 15
 # min_dist (default 0.1)
 min_dist: 0.1
 # if true load the UMAP model
-loadUmapModel: false
+loadUmapModel: true
 # saving the UMAP model
 saveUmapModelFile: "umapModel"
 # loading the UMAP model
@@ -51,7 +52,7 @@ readingFile: emb2D.txt
 # file to save the plot
 plotFile: plot/test.jpg
 # Activate the plot autonaming
-autoNamePlot: true
+autoNamePlot: false
 # showing the plot or not
 showPlot: True
 # size of the dot (default=15) 
@@ -62,13 +63,23 @@ dotLineWidth: 0.25
 protoSize: 25
 # size of the edge of the prototype and the criticism (default=1) 
 protoLineWidth: 1.25
+oneDotPerSpeaker: false
+detailSpeakerClick: True
 
 # prototypes
 # calculate prototypes and criticisms if true
-findProto: True
+findProto: true
+eachSpeaker: true
+nbProto: 2
 # if find proto is true, choose before or after UMAP
-afterReduction: false
+afterReduction: true
 # define the distance calculation
 kernel: euclidienne
 # if find proto is true, calculate the distance between prototypes and criticisms
-gridSearch: True
+gridSearch: false
+
+readingProto: true
+saveFiles: True
+protoFile: proto.txt
+critFile: crit.txt
+uttFile: utt.txt

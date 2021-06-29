@@ -1,7 +1,7 @@
 
 import plotCreator
 import xvectorsParser
-import fileReader
+import fileManager
 import prototypes
 import reductionVectors
 import sys
@@ -21,6 +21,13 @@ loadUmapModelFile=""
 saveLdaModelFile=""
 loadLdaModelFile=""
 exportReductionFile=""
+
+saveProtoFile=""
+saveCritFile=""
+saveUttFile=""
+
+
+
 #reading
 readingFile=""
 # plot
@@ -38,7 +45,7 @@ def load(file):
     :return utt:
     :return vectors:
     '''
-    utt,vectors=fileReader.readAFile(file)  # read vectors
+    utt,vectors=fileManager.readAFile(file)  # read vectors
 
 
     return utt,vectors
@@ -55,6 +62,10 @@ def errorExit(msg,code=-1):
 
 def autoName(plotFile,dimension,reductionMethod,intra,inter):
     f = plotFile.split("/")
+    f.pop()
+    path=""
+    for i in f:
+        path+=i+os.path.sep
     mode = reductionMethod.split(",")
     s = ""
     if "LDA" in mode and "UMAP" not in mode and yaml_content.get("afterReduction"):
@@ -72,9 +83,9 @@ def autoName(plotFile,dimension,reductionMethod,intra,inter):
     gridSearch = round(intra, 2)
     g2=round(inter, 2)
     if intra==-1:
-        file = resources + os.path.sep + f[0] + os.path.sep +str(dimension)+"D"+"_"+ yaml_content.get("kernel")+"_"+ s + ".jpg"
+        file = resources + os.path.sep + path +str(dimension)+"D"+"_"+ yaml_content.get("kernel")+"_"+ s + ".jpg"
     else:
-        file = resources + os.path.sep + f[0] + os.path.sep +str(dimension)+"D"+"_"+yaml_content.get("kernel")+"_"+ s + "_" + str(gridSearch)+"_"+str(g2) + ".jpg"
+        file = resources + os.path.sep + path  +str(dimension)+"D"+"_"+yaml_content.get("kernel")+"_"+ s + "_" + str(gridSearch)+"_"+str(g2) + ".jpg"
     return file
 
 def readConf(fileName):
@@ -97,6 +108,10 @@ def readConf(fileName):
     global loadUmapModelFile
     global saveLdaModelFile
     global loadLdaModelFile
+    global saveProtoFile
+    global saveCritFile
+    global saveUttFile
+
     if not os.path.isfile(fileName):        # check if conf file exist
         errorExit("Conf file : "+fileName+" does not exist")
     yaml_file = open(fileName, 'r')
@@ -113,22 +128,41 @@ def readConf(fileName):
     filePlotExport=yaml_content.get("plotFile")
     sounds=yaml_content.get("sounds_dir")
     resources=yaml_content.get("resources_dir")
+    exportDir=yaml_content.get("export_dir")
+    if not (os.path.isdir(resources+os.path.sep+exportDir)):
+        os.mkdir(resources+os.path.sep+exportDir)
     saveUmapModelFile = yaml_content.get("saveUmapModelFile")
     if saveUmapModelFile!="":
-        saveUmapModelFile = resources + os.path.sep + yaml_content.get("saveUmapModelFile")
+        saveUmapModelFile = resources + os.path.sep + exportDir+os.path.sep +yaml_content.get("saveUmapModelFile")
     loadUmapModelFile=yaml_content.get("loadUmapModelFile")
     if loadUmapModelFile!="":
-        loadUmapModelFile = resources + os.path.sep + yaml_content.get("loadUmapModelFile")
+        loadUmapModelFile = resources + os.path.sep +exportDir+os.path.sep + yaml_content.get("loadUmapModelFile")
     saveLdaModelFile = yaml_content.get("saveLdaModelFile")
     if saveLdaModelFile!="":
-        saveLdaModelFile = resources + os.path.sep + yaml_content.get("saveLdaModelFile")
+        saveLdaModelFile = resources + os.path.sep +exportDir+os.path.sep + yaml_content.get("saveLdaModelFile")
     loadLdaModelFile=yaml_content.get("loadLdaModelFile")
     if loadLdaModelFile!="":
-        loadLdaModelFile = resources + os.path.sep + yaml_content.get("loadLdaModelFile")
+        loadLdaModelFile = resources + os.path.sep +exportDir+os.path.sep + yaml_content.get("loadLdaModelFile")
+    saveProtoFile = yaml_content.get("protoFile")
+    if saveProtoFile!="":
+        saveProtoFile = resources + os.path.sep + exportDir+os.path.sep +yaml_content.get("protoFile")
+    saveCritFile = yaml_content.get("critFile")
+    if saveCritFile!="":
+        saveCritFile = resources + os.path.sep + exportDir+os.path.sep +yaml_content.get("critFile")
+    saveUttFile = yaml_content.get("uttFile")
+    if saveUttFile!="":
+        saveUttFile = resources + os.path.sep + exportDir+os.path.sep +yaml_content.get("uttFile")
     xvectorsFile=resources+os.path.sep+xvectorsFile
     exportReductionFile=resources+os.path.sep+exportReductionFile
     readingFile=resources+os.path.sep+readingFile
     filePlotExport=resources+os.path.sep+filePlotExport
+    f=filePlotExport.split("/")
+    f.pop()
+    d=""
+    for i in f:
+        d+=i+"/"
+    if not (os.path.isdir(d)):
+        os.mkdir(d)
     return yaml_content
 
 
@@ -145,6 +179,8 @@ if __name__ == "__main__":
     mode=mode.strip()
     lprototypes =[]
     lcriticisms=[]
+    classifiedVectors=None
+    classifiedUtt=None
     gridSearchIntra=0
     gridSearchInter=0
     if (mode=="reduction"):   # mode  reduction
@@ -157,7 +193,11 @@ if __name__ == "__main__":
                 vectors=reductionVectors.ldaMethod(utt,vectors,mode,yaml_content.get("dimension"))
                 i = mode.index("LDA")
                 del mode[i]
-            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"),yaml_content.get("kernel"))
+            if yaml_content.get("eachSpeaker"):
+                lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"),yaml_content.get("kernel"))
+            else:
+                classifiedVectors, lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(utt, vectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"), yaml_content.get("kernel"))
+
             # if "LDA" in mode and "UMAP" not in mode:
             #     vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
             #     i = mode.index("LDA")
@@ -165,25 +205,43 @@ if __name__ == "__main__":
         utt,vectors=reductionVectors.reduce(utt,vectors,mode,exportReductionFile,int(yaml_content.get("dimension")),yaml_content.get("n_neighbor"),yaml_content.get("min_dist"),yaml_content.get("loadUmapModel"),saveUmapModelFile,loadUmapModelFile,yaml_content.get("loadLdaModel"),saveLdaModelFile,loadLdaModelFile,yaml_content.get("variableSelectionOption"),yaml_content.get("variablesSelectionNumber"))
         utt,vectors=load(exportReductionFile)
     elif (mode=="read"):      # reading mode
-        if not os.path.isfile(readingFile):  # check if conf file exist
-            errorExit("File : " + readingFile + " does not exist")
-        utt,vectors=load(readingFile)
+        # if not os.path.isfile(readingFile):  # check if conf file exist
+        #     errorExit("File : " + readingFile + " does not exist")
+        # utt,vectors=load(readingFile)
+        if (yaml_content.get("readingProto")):
+            print("reading files...")
+            classifiedUtt,classifiedVectors,lprototypes,lcriticisms=fileManager.readFiles(saveUttFile,saveProtoFile,saveCritFile)
+            vectors=classifiedVectors
+            utt=classifiedUtt
+            print(len(vectors))
+        else:
+            utt,vectors=fileManager.readUtt(saveUttFile)
     else:
         errorExit("Mode invalid")
     # #print(len(vectors[0]))
     # #prototypes.classify(vectors,utt)
     dimension = 2
-    if len(vectors[0]) == 3:
+
+    if len(vectors)>0 and len(vectors[0]) == 3:
         dimension = 3
-    if yaml_content.get("findProto"):
-        if (yaml_content.get("afterReduction")):
-            lprototypes,lcriticisms,gridSearchIntra,gridSearchInter=prototypes.prototypesEachSpeaker(utt,vectors,yaml_content.get("gridSearch"),yaml_content.get("kernel"))
+    if (yaml_content.get("findProto") ) or (yaml_content.get("readingProto") and mode=="read"):
+        if not(yaml_content.get("readingProto")) or mode!="read":
+            if (yaml_content.get("afterReduction")):
+                if yaml_content.get("eachSpeaker"):
+                    classifiedVectors,classifiedUtt, lprototypes, lcriticisms, gridSearchIntra, gridSearchInter=prototypes.prototypesEachSpeaker(utt, vectors, yaml_content.get("gridSearch"), yaml_content.get("kernel"))
+                else:
+                    classifiedVectors,classifiedUtt, lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(utt, vectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"), yaml_content.get("kernel"))
+            if (yaml_content.get("saveFiles")):
+                if saveProtoFile!="" and saveCritFile!="" and saveUttFile!="":
+                    fileManager.exportFiles(classifiedUtt, classifiedVectors, lprototypes, lcriticisms, saveUttFile, saveProtoFile, saveCritFile)
+                else:
+                    print("You want to save files but at least one is not defined")
         if (yaml_content.get("autoNamePlot")):
             filePlotExport=autoName(yaml_content.get("plotFile"),dimension,yaml_content.get("reductionMethod"),gridSearchIntra,gridSearchInter)
         if (len(vectors)>0 and dimension==3):    # if 3D vectors
             plotCreator.create3DPlotPrototypes(vectors,lprototypes,lcriticisms,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
         else:       # 2D vectors
-            plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),yaml_content.get("protoSize"),yaml_content.get("dotLineWidth"),yaml_content.get("protoLineWidth"),sounds)
+            plotCreator.create2DPlotPrototypes(vectors,lprototypes,lcriticisms, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),yaml_content.get("protoSize"),yaml_content.get("dotLineWidth"),yaml_content.get("protoLineWidth"),sounds,yaml_content.get("oneDotPerSpeaker"),yaml_content.get("detailSpeakerClick"))
             #plotCreator.create2DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
     else:
         if (yaml_content.get("autoNamePlot")):
@@ -191,7 +249,7 @@ if __name__ == "__main__":
         if (len(vectors)>0 and dimension==3):   # if 3D vectors
             plotCreator.create3DPlot(vectors,utt,yaml_content.get("showPlot"),filePlotExport,yaml_content.get("dotSize"))
         else:       # 2D vectors
-            plotCreator.create2DPlot(vectors, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),sounds)
+            plotCreator.create2DPlot(vectors, utt, yaml_content.get("showPlot"), filePlotExport, yaml_content.get("dotSize"),yaml_content.get("dotLineWidth"),sounds,yaml_content.get("detailSpeakerClick"))
     #print(vectors.shape)
 
 

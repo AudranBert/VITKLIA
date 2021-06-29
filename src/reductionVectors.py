@@ -3,9 +3,9 @@ import os.path
 import sys
 import prototypes
 import xvectorsParser
-import umap
+import umap.umap_ as umap
 import plotCreator
-import fileReader
+import fileManager
 import run
 import pickle
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
@@ -122,7 +122,7 @@ def reduce(utt,vectors,reductionMethod,fileToExport,dimension,n_neighbor=15,min_
         if "UMAP" in method:
             embedding=umapMethod(vectors,dimension,n_neighbor,min_dist,loadUmap,saveUmapModel,loadUmapModel)
         #printAll(utt,embedding)
-        fileReader.exportData(utt, embedding, fileToExport)      # save 2D vectors
+        fileManager.exportData(utt, embedding, fileToExport)      # save 2D vectors
         return utt,embedding
     else:
         run.errorExit("dimension must be 2 or 3")
