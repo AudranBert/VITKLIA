@@ -72,9 +72,10 @@ def playSound(i,xy,utt):
 	global stream
 	global wf
 	global p
-	if (i >= 0):  # if a point have been found
-		spk=utt[i].split("-")
-		print("The point is :", xy[i])
+	if (i != None and i!=-1):  # if a point have been found
+		print(i)
+		spk=utt[i[0]][i[1]].split("-")
+		print("The point is :", xy[i[0]][i[1]])
 		print("The speaker is :",spk[0])
 		if stream!=None:
 			# stop stream
@@ -84,8 +85,8 @@ def playSound(i,xy,utt):
 			# close PyAudio
 			paudio.terminate()
 			print("stop")
-		if (i <= len(utt)):  # if a sound exist
-			print(wavLink.getFileWithPathToData(sounds_dir,utt[i]))
+		#if (i <= len(utt)):  # if a sound exist
+		#	print(wavLink.getFileWithPathToData(sounds_dir,utt[i]))
 			#playsound(s[i])
 		#pyAudioStarting("../resources/sounds/1.wav")
 
@@ -96,8 +97,11 @@ def rePlot(spk):
 		x=[]
 		y=[]
 		ct=0
+
 		for i in range(len(uttOrdered)):
-			if uttOrdered[i]==spk:
+			z=uttOrdered[i][0].split("-")
+			z=z[0]
+			if z==spk:
 				ct=i
 				for j in range (len(xyzOrdered[i])):
 					x.append(xyzOrdered[i][j][0])
@@ -115,11 +119,12 @@ def rePlot(spk):
 				legend="dist with criticism:"+str(round(d,2))
 				plt.plot([],[],color='white',label=legend)
 				s=0
-				for i in range(len(x)):
-					s=s+math.dist(p,[x[i],y[i]])
-				d=s/len(x)
-				legend="mean dist:"+str(round(d,2))
-				plt.plot([],[],color='white',label=legend)
+				if len(x)>0:
+					for i in range(len(x)):
+						s=s+math.dist(p,[x[i],y[i]])
+					d=s/len(x)
+					legend="mean dist:"+str(round(d,2))
+					plt.plot([],[],color='white',label=legend)
 				plt.legend()
 		title = "Speaker :" + str(spk)
 		cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick2DPlaySound(event, ax, xyz, utt))
@@ -152,21 +157,22 @@ def onclick2DOpenNewPlot(event,ax,xy,utt):		#click on the plot
 		print("The click : ",event.xdata," ",event.ydata)
 		point=-1
 		for i in range (0,len(xy)):	#search the nearest point
-			minX=event.xdata-0.5
-			maxX=event.xdata+0.5
-			minY=event.ydata-0.5
-			maxY=event.ydata+0.5
-			if (xy[i][0]>=minX and xy[i][0]<=maxX and xy[i][1]>=minY and xy[i][1]<=maxY):	#near enough
-				if(point!=-1):		#if a point have been already found
-					#print(i," vs ",point)
-					distanceEvent=math.sqrt(pow(xy[i][0]-event.xdata,2)+pow(xy[i][1]-event.ydata,2))	#distance between the event and the point we are looking at
-					distancePoint=math.sqrt(pow(xy[point][0]-event.xdata,2)+pow(xy[point][1]-event.ydata,2))	#distance between the event and the closest pont we have found
-					#print(distanceEvent," vs ",distancePoint)
-					if(distancePoint>distanceEvent): 		#find the nearest
-						point=i
-				else:
-					point=i
-		spk = utt[point].split("-")
+			for j in range(len(xy[i])):
+				minX=event.xdata-0.5
+				maxX=event.xdata+0.5
+				minY=event.ydata-0.5
+				maxY=event.ydata+0.5
+				if (xy[i][j][0]>=minX and xy[i][j][0]<=maxX and xy[i][j][1]>=minY and xy[i][j][1]<=maxY):	#near enough
+					if(point!=-1):		#if a point have been already found
+						#print(i," vs ",point)
+						distanceEvent=math.sqrt(pow(xy[i][j][0]-event.xdata,2)+pow(xy[i][j][1]-event.ydata,2))	#distance between the event and the point we are looking at
+						distancePoint=math.sqrt(pow(xy[point[0]][point[1]][0]-event.xdata,2)+pow(xy[point[0]][point[1]][1]-event.ydata,2))	#distance between the event and the closest pont we have found
+						#print(distanceEvent," vs ",distancePoint)
+						if(distancePoint>distanceEvent): 		#find the nearest
+							point=[i,j]
+					else:
+						point=[i,j]
+		spk = utt[point[0]][point[1]].split("-")
 		rePlot(spk[0])
 
 def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
@@ -175,46 +181,48 @@ def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
 		print("The click : ",event.xdata," ",event.ydata)
 		point=-1
 		for i in range (0,len(xy)):	#search the nearest point
-			minX=event.xdata-0.5
-			maxX=event.xdata+0.5
-			minY=event.ydata-0.5
-			maxY=event.ydata+0.5
-			if (xy[i][0]>=minX and xy[i][0]<=maxX and xy[i][1]>=minY and xy[i][1]<=maxY):	#near enough
-				if(point!=-1):		#if a point have been already found
-					#print(i," vs ",point)
-					distanceEvent=math.sqrt(pow(xy[i][0]-event.xdata,2)+pow(xy[i][1]-event.ydata,2))	#distance between the event and the point we are looking at
-					distancePoint=math.sqrt(pow(xy[point][0]-event.xdata,2)+pow(xy[point][1]-event.ydata,2))	#distance between the event and the closest pont we have found
-					#print(distanceEvent," vs ",distancePoint)
-					if(distancePoint>distanceEvent): 		#find the nearest
-						point=i
-				else:
-					point=i
+			for j in range(len(xy[i])):
+				minX=event.xdata-0.5
+				maxX=event.xdata+0.5
+				minY=event.ydata-0.5
+				maxY=event.ydata+0.5
+				if (xy[i][j][0]>=minX and xy[i][j][0]<=maxX and xy[i][j][1]>=minY and xy[i][j][1]<=maxY):	#near enough
+					if(point!=-1):		#if a point have been already found
+						#print(i," vs ",point)
+						distanceEvent=math.sqrt(pow(xy[i][j][0]-event.xdata,2)+pow(xy[i][j][1]-event.ydata,2))	#distance between the event and the point we are looking at
+						distancePoint=math.sqrt(pow(xy[point[0]][point[1]][0]-event.xdata,2)+pow(xy[point[0]][point[1]][1]-event.ydata,2))	#distance between the event and the closest pont we have found
+						#print(distanceEvent," vs ",distancePoint)
+						if(distancePoint>distanceEvent): 		#find the nearest
+							point=[i,j]
+					else:
+						point=[i,j]
 		playSound(point,xy,utt)
 
 
 	
-def onclick3D(event,ax,xyz,sounds):		#click on the plot
+def onclick3D(event,ax,xyz,utt):		#click on the plot
 	if event.inaxes!=None:	#inside the plot
 		coords=find3DCoords(event, ax)
 		point=-1
 		for i in range (0,len(xyz)):	#search the nearest point
-			minX=coords[0]-1
-			maxX=coords[0]+1
-			minY=coords[1]-1
-			maxY=coords[1]+1
-			minZ = coords[2] - 1
-			maxZ =coords[2] + 1
-			if (xyz[i][0]>=minX and xyz[i][0]<=maxX and xyz[i][1]>=minY and xyz[i][1]<=maxY and xyz[i][2]>=minZ and xyz[i][2]<=maxZ):	#near enough
-				if(point!=-1):		#if a point have been already found
-					#print(i," vs ",point)
-					distanceEvent=math.sqrt(pow(xyz[i][0]-coords[0],2)+pow(xyz[i][1]-coords[1],2)+pow(xyz[i][2]-coords[2],2))	#distance between the event and the point we are looking at
-					distancePoint=math.sqrt(pow(xyz[point][0]-coords[0],2)+pow(xyz[point][1]-coords[1],2)+pow(xyz[i][2]-coords[2],2))	#distance between the event and the closest pont we have found
-					print(distanceEvent," vs ",distancePoint)
-					if(distancePoint>distanceEvent): 		#find the nearest
-						point=i
-				else:
-					point=i
-		playSound(point,xyz,sounds)
+			for j in range(len(xyz[i])):
+				minX=coords[0]-1
+				maxX=coords[0]+1
+				minY=coords[1]-1
+				maxY=coords[1]+1
+				minZ = coords[2] - 1
+				maxZ =coords[2] + 1
+				if (xyz[i][j][0]>=minX and xyz[i][j][0]<=maxX and xyz[i][j][1]>=minY and xyz[i][j][1]<=maxY and xyz[i][j][2]>=minZ and xyz[i][j][2]<=maxZ):	#near enough
+					if(point!=-1):		#if a point have been already found
+						#print(i," vs ",point)
+						distanceEvent=math.sqrt(pow(xyz[i][j][0]-coords[0],2)+pow(xyz[i][j][1]-coords[1],2)+pow(xyz[i][j][2]-coords[2],2))	#distance between the event and the point we are looking at
+						distancePoint=math.sqrt(pow(xyz[point[0]][point[1]][0]-coords[0],2)+pow(xyz[point[0]][point[1]][1]-coords[1],2)+pow(xyz[point[0]][point[1]][2]-coords[2],2))	#distance between the event and the closest pont we have found
+						#print(distanceEvent," vs ",distancePoint)
+						if(distancePoint>distanceEvent): 		#find the nearest
+							point=[i,j]
+					else:
+						point=[i,j]
+		playSound(point,xyz,utt)
 
 
 def chooseColor(xy,utt):
@@ -276,7 +284,7 @@ def checkDir(path):
 		print("Directory :"+np+" does not exist")
 		return False
 
-def create2DPlot(xy,utt2D,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW=1,soundsdir="",detailSpeakerClick=True):
+def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW=1,soundsdir="",detailSpeakerClick=True):
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -291,7 +299,7 @@ def create2DPlot(xy,utt2D,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 	setOptions(dotS, dotLineW)
 	plot=plt
 	fig, ax = plot.subplots()
-	colorsOrdered,xyzOrdered,uttOrdered=chooseColor(xy, utt)
+	colorsOrdered,xyzOrdered,uttOrdered=chooseColor2(xy, utt)
 	x=[]
 	y=[]
 	for i in xyzOrdered: 	# for each speaker
@@ -334,7 +342,7 @@ def create2DPlot(xy,utt2D,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 	if (show==True):
 		plot.show()
 
-def create2DPlotPrototypes(xy,prototypes,criticisms,utt2D,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True):
+def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True):
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -350,18 +358,20 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt2D,show=False,filePlotExp
 	plot=plt
 	#plot.ion()
 	fig, ax = plot.subplots()
-	colorsOrdered,xyzOrdered,uttOrdered=chooseColor(xy, utt2D)
+	colorsOrdered,xyzOrdered,uttOrdered=chooseColor2(xy, utt2D)
 	lPrototypes=prototypes
 	lCriticisms=criticisms
 	if oneDotPerSpeaker!=True:
 		x=[]
 		y=[]
+
 		for i in xyzOrdered: 	# for each speaker
+			#print(i)
 			x.append([])
 			y.append([])
 			for j in i:
-				x[len(x)-1].append(j[0])	# add the utt
-				y[len(x)-1].append(j[1])
+				x[-1].append(j[0])	# add the utt
+				y[-1].append(j[1])
 		for i in range (0,len(xyzOrdered)):
 			ax.scatter(x[i],y[i],s=dotSize,color=colorsOrdered[i],edgecolors='black',linewidth=dotLineWidth)
 	xp=[]
@@ -397,7 +407,7 @@ def create2DPlotPrototypes(xy,prototypes,criticisms,utt2D,show=False,filePlotExp
 	if (show==True):
 	 	plot.show()
 
-def create3DPlotPrototypes(xyz3D,prototypes,criticisms,utt3D,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
+def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -410,7 +420,7 @@ def create3DPlotPrototypes(xyz3D,prototypes,criticisms,utt3D,show=False,filePlot
 	utt=utt3D
 	setSound(soundsdir)
 	fig = plt.figure()
-	colors, xyzOrdered,uttOrdered = chooseColor(xyz3D, utt3D)
+	colors, xyzOrdered,uttOrdered = chooseColor2(xyz3D, utt3D)
 	x = []
 	y = []
 	z= []
@@ -419,25 +429,25 @@ def create3DPlotPrototypes(xyz3D,prototypes,criticisms,utt3D,show=False,filePlot
 		y.append([])
 		z.append([])
 		for j in i:
-			x[len(x) - 1].append(j[0])
-			y[len(y) - 1].append(j[1])
-			z[len(z) - 1].append(j[1])
+			x[- 1].append(j[0])
+			y[- 1].append(j[1])
+			z[- 1].append(j[1])
 	xp=[]
 	yp=[]
 	zp=[]
 	for i in prototypes:
-		p = xyzOrdered[i[0]][i[1]]
-		xp.append(p[0])	# add the utt
-		yp.append(p[1])
-		zp.append(p[2])
+		#p = xyzOrdered[i[0]][i[1]]
+		xp.append(i[1])	# add the utt
+		yp.append(i[2])
+		zp.append(i[3])
 	xc=[]
 	yc=[]
 	zc=[]
 	for i in criticisms:
-		c = xyzOrdered[i[0]][i[1]]
-		xc.append(c[0])	# add the utt
-		yc.append(c[1])
-		zc.append(c[2])
+		#c = xyzOrdered[i[0]][i[1]]
+		xc.append(i[1])	# add the utt
+		yc.append(i[2])
+		zc.append(i[3])
 	ax = fig.add_subplot(projection='3d')
 	### place the points
 	for i in range (0,len(xyzOrdered)):
@@ -461,10 +471,10 @@ def create3DPlotPrototypes(xyz3D,prototypes,criticisms,utt3D,show=False,filePlot
 	if (show==True):
 		plt.show()
 
-def create3DPlot(xyz,utt,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+def create3DPlot(utt,xyz,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
 	setSound(soundsdir)
 	fig = plt.figure()
-	colors, newutt = chooseColor(xyz, utt)
+	colors, newutt = chooseColor2(xyz, utt)
 	x = []
 	y = []
 	z= []

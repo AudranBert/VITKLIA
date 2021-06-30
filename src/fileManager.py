@@ -83,10 +83,9 @@ def readUtt(vectorFile):
 		l.pop(0)
 		vectors.append([])
 		for i in l:
-			vectors[-1].append(i)
+			vectors[-1].append(float(i))
 	file.close()
-	newvectors,newutt=prototypes.classify(utt,vectors)
-	return newutt,newvectors
+	return utt,vectors
 
 def readFiles(vectorFile,protoFile,critFile):
 	proto=[]
@@ -101,7 +100,10 @@ def readFiles(vectorFile,protoFile,critFile):
 		line = line.strip("\t")
 		line=line.strip()
 		l=line.split(" ")
-		proto.append(l)
+		proto.append([])
+		proto[-1].append(l[0])
+		for i in l[1:]:
+			proto[-1].append(float(i))
 	file.close()
 	file = open(critFile, "r")
 	for line in file:
@@ -109,7 +111,10 @@ def readFiles(vectorFile,protoFile,critFile):
 		line = line.strip("\t")
 		line=line.strip()
 		l=line.split(" ")
-		crit.append(l)
+		crit.append([])
+		crit[-1].append(l[0])
+		for i in l[1:]:
+			crit[-1].append(float(i))
 	file.close()
 
 	return utt,vectors,proto,crit

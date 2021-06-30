@@ -1,6 +1,7 @@
 import math
 
 import plotCreator
+import run
 import fileManager
 import tqdm
 from tqdm import trange
@@ -59,33 +60,7 @@ def sum3MMD(x, n):
 				sum = sum + kernelEuclidienne(x[i], x[j])
 	return (1/(n*n))*sum
 
-def classify(utt,vectors):
-	loc = []
-	nutt=[]
-	newutt = []
-	ctutt = 0
-	for i in utt:
-		idL = i.split("-", 1)
-		id = idL[0]
-		ct = 0
-		find = False
-		for j in loc:
-			if j == id:
-				nutt[ct].append(i)
-				newutt[ct].append(vectors[ctutt])
-				find = True
-				break
-			ct += 1
-		if find == False:
-			loc.append(id)
-			newutt.append([])
-			nutt.append([])
-			nutt[-1].append(i)
-			newutt[len(newutt) - 1].append(vectors[ctutt])
-		ctutt += 1
-	#for i in newutt:
-	#	print(i)
-	return  newutt,nutt
+
 
 def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 	global kernelMode
@@ -98,7 +73,7 @@ def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 	criti=[]
 
 	sum3 = sum3MMD(vectors, len(vectors))
-	newvectors,newutt=classify(utt,vectors)
+	newutt,newvectors=run.classify(utt,vectors)
 	for ct in trange(nbPrototypes) :
 		#print("---------------------")
 		MMD=[]
@@ -106,7 +81,6 @@ def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 			MMD.append([])
 			for j in range(len(newvectors[i])):
 				z.append(newvectors[i][j])
-				#print(z)
 				mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, vectors, len(z), len(vectors)) + sum3
 				z.pop()
 				MMD[-1].append(mmd2)
@@ -124,6 +98,7 @@ def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 			for i in newvectors[min[0]][min[1]]:
 				proto[-1].append(i)
 			z.append(newvectors[min[0]][min[1]])
+
 		if(max[0]!=-1):
 			criti.append([])
 			criti[-1].append(newutt[max[0]][max[1]])
@@ -140,7 +115,7 @@ def prototypesEachSpeaker(utt,vectors,grid,kernelM):
 	kernelMode=kernelM
 	print("Prototypes and criticisms...")
 	time.sleep(0.2)
-	newvectors,newutt=classify(utt,vectors)
+	newutt,newvectors=run.classify(utt,vectors)
 	nbPrototypes=len(newutt)
 	z=[]
 	proto=[]

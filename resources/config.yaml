@@ -46,7 +46,7 @@ saveLdaModelFile: "ldaModel"
 loadLdaModelFile: "ldaModel"
 
 # no reduction	(mode=read)
-readingFile: emb2D.txt
+#readingFile: emb2D.txt
 
 # plot properties
 # file to save the plot
@@ -64,7 +64,7 @@ protoSize: 25
 # size of the edge of the prototype and the criticism (default=1) 
 protoLineWidth: 1.25
 oneDotPerSpeaker: false
-detailSpeakerClick: True
+detailSpeakerClick: true
 
 # prototypes
 # calculate prototypes and criticisms if true
