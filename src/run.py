@@ -116,6 +116,9 @@ def classify(utt, vectors):
         ctutt += 1
     return nutt,newutt
 
+def uttToSpk(id):
+    spk=id.split("-")
+    return spk[0]
 
 def readConf(fileName):
     '''
@@ -223,8 +226,11 @@ if __name__ == "__main__":
                 i = mode.index("LDA")
                 del mode[i]
             if yaml_content.get("eachSpeaker"):
-                lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(utt,
-                                                                                                              vectors,
+                newutt, newvectors = classify(utt, vectors)
+                lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(newutt,
+                                                                                                              newvectors,
+                                                                                                              yaml_content.get(
+                                                                                                                  "nbProto"),
                                                                                                               yaml_content.get(
                                                                                                                   "gridSearch"),
                                                                                                               yaml_content.get(
@@ -277,10 +283,17 @@ if __name__ == "__main__":
         if not (yaml_content.get("readingProto")) or mode != "read":
             if (yaml_content.get("afterReduction")):
                 if yaml_content.get("eachSpeaker"):
-                    classifiedVectors, classifiedUtt, lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(
-                        utt, vectors, yaml_content.get("gridSearch"), yaml_content.get("kernel"))
+                    classifiedUtt, classifiedVectors = classify(utt, vectors)
+                    if yaml_content.get("reducedUtterances"):
+                        lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(
+                        classifiedUtt, classifiedVectors,yaml_content.get("nbProto"), yaml_content.get("gridSearch"), yaml_content.get("kernel"),yaml_content.get("groupSize"))
+                    else:
+                        lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(
+                            classifiedUtt, classifiedVectors, yaml_content.get("nbProto"),
+                            yaml_content.get("gridSearch"), yaml_content.get("kernel"))
                 else:
-                    classifiedVectors, classifiedUtt, lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
+                    classifiedUtt, classifiedVectors = classify(utt, vectors)
+                    lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
                         utt, vectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
                         yaml_content.get("kernel"))
             if (yaml_content.get("saveFiles")):
@@ -292,6 +305,7 @@ if __name__ == "__main__":
         if (yaml_content.get("autoNamePlot")):
             filePlotExport = autoName(yaml_content.get("plotFile"), dimension, yaml_content.get("reductionMethod"),
                                       gridSearchIntra, gridSearchInter)
+        prototypes.changePrototypesFormat(lprototypes)
         if (len(vectors) > 0 and dimension == 3):  # if 3D vectors
             plotCreator.create3DPlotPrototypes(classifiedUtt,classifiedVectors, lprototypes, lcriticisms, yaml_content.get("showPlot"),
                                                filePlotExport, yaml_content.get("dotSize"))

@@ -1,6 +1,7 @@
 import os.path
 #import pyaudio
 import wave
+import run
 import re
 import matplotlib.pyplot as plt
 from playsound import playsound
@@ -108,20 +109,36 @@ def rePlot(spk):
 					y.append(xyzOrdered[i][j][1])
 		plt.scatter(x,y,s=dotSize,color=colorsOrdered[ct],edgecolors='black',linewidth=dotLineWidth)
 		if lPrototypes!=None:
-			if ct<=len(lPrototypes):
-				p=lPrototypes[ct]
-				p=p[1:]
-				plt.scatter(p[0], p[1], color=colorsOrdered[ct],s=protoSize, marker="D",edgecolors='black',linewidth=protoLineWidth)
-				c=lCriticisms[ct]
-				c=c[1:]
-				plt.scatter(c[0], c[1], color=colorsOrdered[ct], s=protoSize, marker="^", edgecolors='black',linewidth=protoLineWidth)
-				d=math.dist(p,c)
-				legend="dist with criticism:"+str(round(d,2))
-				plt.plot([],[],color='white',label=legend)
+			xp = []
+			yp = []
+			p = []
+			for i in lPrototypes:
+				spkP=run.uttToSpk(i[0])
+				if spkP==spk:
+					xp.append(i[1])
+					yp.append(i[2])
+					p.append(i[1:])
+
+			xc = []
+			yc = []
+			c = []
+			for i in lCriticisms:
+				spkC=run.uttToSpk(i[0])
+				if spkC==spk:
+					xc.append(i[1])
+					yc.append(i[2])
+					c.append(i[1:])
+			plt.scatter(xp, yp, color=colorsOrdered[ct],s=protoSize, marker="D",edgecolors='black',linewidth=protoLineWidth)
+			plt.scatter(xc, yc, color=colorsOrdered[ct], s=protoSize, marker="^", edgecolors='black',linewidth=protoLineWidth)
+			if len(p)>0 :
+				if  len(c)>0:
+					d=math.dist(p[0],c[0])
+					legend="dist with criticism:"+str(round(d,2))
+					plt.plot([],[],color='white',label=legend)
 				s=0
 				if len(x)>0:
 					for i in range(len(x)):
-						s=s+math.dist(p,[x[i],y[i]])
+							s=s+math.dist(p[0],[x[i],y[i]])
 					d=s/len(x)
 					legend="mean dist:"+str(round(d,2))
 					plt.plot([],[],color='white',label=legend)
@@ -172,8 +189,9 @@ def onclick2DOpenNewPlot(event,ax,xy,utt):		#click on the plot
 							point=[i,j]
 					else:
 						point=[i,j]
-		spk = utt[point[0]][point[1]].split("-")
-		rePlot(spk[0])
+		if point!=-1:
+			spk = utt[point[0]][point[1]].split("-")
+			rePlot(spk[0])
 
 def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
 	global plot
@@ -272,6 +290,25 @@ def chooseColor2(xy,utt):
 	print("Number of speakers:",len(colors))
 	return colors,xy,utt
 
+def chooseColorProto(utt,xy,colors,proto,crit):
+	colorsProto=[]
+	colorsCrit=[]
+	for i in proto:
+		for j in range(len(utt)):
+			spkJ=run.uttToSpk(utt[j][0])
+			spkI=run.uttToSpk(i[0])
+			if spkJ==spkI:
+				colorsProto.append(colors[j])
+				break
+	for i in crit:
+		for j in range(len(utt)):
+			spkJ=run.uttToSpk(utt[j][0])
+			spkI=run.uttToSpk(i[0])
+			if spkJ==spkI:
+				colorsCrit.append(colors[j])
+				break
+	return colorsProto,colorsCrit
+
 def checkDir(path):
 	p=path.split("/")
 	p.pop()
@@ -342,7 +379,35 @@ def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 	if (show==True):
 		plot.show()
 
-def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True):
+def autoScaleFunction(proto,crit,size):
+	autoScale=[]
+	base = size
+	maxSize = size * 2
+	maxDist = 0
+	spk=[]
+
+	for i in range(len(proto)):
+		for j in range(len(crit)):
+			spkP=run.uttToSpk(proto[i][0])
+			spkC=run.uttToSpk(crit[j][0])
+			if spkC==spkP and spkP not in spk:
+				d=math.dist(proto[i][1:],crit[j][1:])
+				if d>maxDist:
+					maxDist=d
+
+
+	for i in range(len(proto)):
+		for j in range(len(crit)):
+			spkP=run.uttToSpk(proto[i][0])
+			spkC=run.uttToSpk(crit[j][0])
+			if spkC==spkP and spkP not in spk:
+				d=math.dist(proto[i][1:],crit[j][1:])
+				spk.append(spkP)
+				d=(d*maxSize)/maxDist
+				autoScale.append(d)
+	return autoScale
+
+def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -359,6 +424,7 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 	#plot.ion()
 	fig, ax = plot.subplots()
 	colorsOrdered,xyzOrdered,uttOrdered=chooseColor2(xy, utt2D)
+	colorsProto,colorsCrit=chooseColorProto(uttOrdered,xyzOrdered,colorsOrdered,prototypes,criticisms)
 	lPrototypes=prototypes
 	lCriticisms=criticisms
 	if oneDotPerSpeaker!=True:
@@ -376,20 +442,33 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 			ax.scatter(x[i],y[i],s=dotSize,color=colorsOrdered[i],edgecolors='black',linewidth=dotLineWidth)
 	xp=[]
 	yp=[]
-	for i in prototypes:
+	#print(len(lPrototypes))
+	for i in lPrototypes:
 		#p=xyzOrdered[i[0]][i[1]]
+		#print(i)
 		xp.append(i[1])	# add the utt
 		yp.append(i[2])
 	xc=[]
 	yc=[]
-	for i in criticisms:
+	#print(len(colorsProto))
+	for i in lCriticisms:
 		#c = xyzOrdered[i[0]][i[1]]
 		xc.append(i[1])  # add the utt
 		yc.append(i[2])
-	for i in range (len(xp)):
-		ax.scatter(xp[i], yp[i], color=colorsOrdered[i],s=protoSize, marker="D",edgecolors='black',linewidth=protoLineWidth)
+	print(len(xp))
+	autoScale=[]
+	if autoScaleDot:
+		autoScale=autoScaleFunction(lPrototypes,lCriticisms,protoSize)
 	for i in range (len(xc)):
-		ax.scatter(xc[i], yc[i],color=colorsOrdered[i], s=protoSize, marker="^",edgecolors='black',linewidth=protoLineWidth)
+		ax.scatter(xc[i], yc[i],color=colorsCrit[i], s=protoSize, marker="^",edgecolors='black',linewidth=protoLineWidth)
+	for i in range (len(xp)):
+		#print(xp[i],"  ",xc[i])
+		#print(i)
+		if autoScaleDot:
+			ax.scatter(xp[i], yp[i], color=colorsProto[i], s=autoScale[i], marker="D", edgecolors='black',linewidth=protoLineWidth)
+		else:
+			ax.scatter(xp[i], yp[i], color=colorsProto[i],s=protoSize, marker="D",edgecolors='black',linewidth=protoLineWidth)
+
 		#plt.clabel(ax,colors='blue')
 	if detailSpeakerClick:
 		cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick2DOpenNewPlot(event, ax, xy, utt))

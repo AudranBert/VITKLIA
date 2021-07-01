@@ -62,7 +62,7 @@ def sum3MMD(x, n):
 
 
 
-def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
+def prototypes(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 	global kernelMode
 	kernelMode=kernelM
 	print("Prototypes and criticisms...")
@@ -71,9 +71,12 @@ def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 	z=[]
 	proto=[]
 	criti=[]
-
+	vectors=[]
+	for i in newvectors:
+		for j in i:
+			vectors.append(j)
 	sum3 = sum3MMD(vectors, len(vectors))
-	newutt,newvectors=run.classify(utt,vectors)
+
 	for ct in trange(nbPrototypes) :
 		#print("---------------------")
 		MMD=[]
@@ -108,53 +111,114 @@ def prototypes(utt,vectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 	g2=-1
 	if grid:
 		g,g2=gridSearch(newvectors,proto,criti)
-	return newvectors,newutt,proto,criti,g,g2
+	return proto,criti,g,g2
 
-def prototypesEachSpeaker(utt,vectors,grid,kernelM):
+def changePrototypesFormat(proto):
+	classifiedProto=[]
+	classifiedUtt=[]
+	speakerList=[]
+	for i in proto:
+		if run.uttToSpk(i[0]) in speakerList:
+			#print(run.uttToSpk(i[0]))
+			j=speakerList.index(run.uttToSpk(i[0]))
+			classifiedProto[j].append(i[1:])
+			classifiedUtt[j].append(i[0])
+		else:
+			classifiedProto.append([])
+			classifiedProto[-1].append(i[1:])
+			speakerList.append(run.uttToSpk(i[0]))
+			classifiedUtt.append([])
+			classifiedUtt[-1].append(i[0])
+	# for i in range(len(classifiedProto)):
+	# 	print(i, "  ",end='')
+	# 	print(run.uttToSpk(classifiedUtt[i][0]), "  ",end='')
+	# 	print(classifiedProto[i])
+	return classifiedUtt,classifiedProto
+
+def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="euclidienne",groupSize=10,reducted=True):
+	sizeTot=len(classifiedVectors)
+	groupNb=sizeTot/groupSize
+	groupNb=math.ceil(groupNb)
+	lProto=[]
+	lCrit=[]
+	ct=0
+	for i in range(groupNb):
+		subUtt=[]
+		subVectors=[]
+		for j in range(groupSize):
+			if (ct)<len(classifiedVectors):
+				subVectors.append(classifiedVectors[ct])
+				subUtt.append(classifiedUtt[ct])
+				ct+=1
+		subProto,subCrit,g,g2=prototypesEachSpeaker(subUtt,subVectors,nbPrototypes,grid,kernelM)
+
+		for i in subProto:
+			lProto.append(i)
+		for i in subCrit:
+			lCrit.append(i)
+	if reducted:
+		utt,vectors=changePrototypesFormat(lProto)
+		lProto,tmp,g,g2=prototypes(utt,vectors,10,grid,kernelM)
+	return lProto,lCrit,g,g2
+
+def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
 	global kernelMode
 	kernelMode=kernelM
 	print("Prototypes and criticisms...")
 	time.sleep(0.2)
-	newutt,newvectors=run.classify(utt,vectors)
-	nbPrototypes=len(newutt)
+	nbPrototypesTot=len(newutt)
 	z=[]
 	proto=[]
 	criti=[]
 	#ct=0
+	uttP=[]
+	uttC=[]
+	for ct in trange(nbPrototypesTot) :
+		sum3 = sum3MMD(newvectors[ct], len(newvectors[ct]))
+		for j in range(nbPrototypes):
+			#print("---------------------")
+			MMD=[]
+			for i in range(len(newvectors[ct])):
+				z.append(newvectors[ct][i])
+				#print(z)
+				mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
+				z.pop()
+				MMD.append(mmd2)
+			min = -1
+			max=-1
+			for i in range (0,len(MMD)):
+				if ((min==-1 or MMD[min]>MMD[i])  and  (newvectors[ct][i] not in proto)):
+					min = i
+				if ((max==-1 or MMD[max]<MMD[i]) and  (newvectors[ct][i] not in criti)):
+					max = i
+			if (min!=-1):
+				proto.append(newvectors[ct][min])
+				uttP.append(newutt[ct][min])
+				# for i in newvectors[ct][min]:
+				# 	proto[-1].append(i)
+				z.append(newvectors[ct][min])
+			if(max!=-1):
+				criti.append(newvectors[ct][max])
+				uttC.append(newutt[ct][max])
+				# for i in newvectors[ct][max]:
+				# 	criti[-1].append(i)
 
-	for ct in trange(nbPrototypes) :
-		#print("---------------------")
-		MMD=[]
-		sum3=sum3MMD(newvectors[ct], len(newvectors[ct]))
-		for i in range(len(newvectors[ct])):
-			z.append(newvectors[ct][i])
-			#print(z)
-			mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
-			z.pop()
-			MMD.append(mmd2)
-		min = -1
-		max=-1
-		for i in range (0,len(MMD)):
-			if ((min==-1 or MMD[min]>MMD[i])  and  (newvectors[ct][i] not in proto)):
-				min = i
-			if ((max==-1 or MMD[max]<MMD[i]) and  (newvectors[ct][i] not in criti)):
-				max = i
-		if (min!=-1):
-			proto.append([])
-			proto[-1].append(newutt[ct][min])
-			for i in newvectors[ct][min]:
-				proto[-1].append(i)
-			z.append(newvectors[ct][min])
-		if(max!=-1):
-			criti.append([])
-			criti[-1].append(newutt[ct][max])
-			for i in newvectors[ct][max]:
-				criti[-1].append(i)
+	lproto=[]
+	lcrit=[]
+	for i in range(len(uttP)):
+		lproto.append([])
+		lproto[-1].append(uttP[i])
+		for j in proto[i]:
+			lproto[-1].append(j)
+		lcrit.append([])
+		lcrit[-1].append(uttC[i])
+		for j in criti[i]:
+			lcrit[-1].append(j)
 	g=-1
 	g2=-1
 	if grid:
 		g,g2=gridSearch(newvectors,proto,criti)
-	return newvectors,newutt,proto,criti,g,g2
+	return lproto,lcrit,g,g2
 
 def gridSearch(newutt,proto,crit):
 	sum=0

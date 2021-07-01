@@ -63,7 +63,7 @@ dotLineWidth: 0.25
 protoSize: 25
 # size of the edge of the prototype and the criticism (default=1) 
 protoLineWidth: 1.25
-oneDotPerSpeaker: false
+oneDotPerSpeaker: true
 detailSpeakerClick: true
 
 # prototypes
@@ -83,3 +83,7 @@ saveFiles: True
 protoFile: proto.txt
 critFile: crit.txt
 uttFile: utt.txt
+
+
+reducedUtterances: true
+groupSize: 20
