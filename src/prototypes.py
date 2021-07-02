@@ -32,6 +32,7 @@ def sum1MMD(z, m):
 			elif kernelMode=="test":
 				sum = sum + kernelTest(z[i], z[j])
 			else:
+
 				sum = sum + kernelEuclidienne(z[i], z[j])
 	return (1/(m*m))*sum
 
@@ -73,8 +74,12 @@ def prototypes(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne")
 	criti=[]
 	vectors=[]
 	for i in newvectors:
+		#print(i)
 		for j in i:
 			vectors.append(j)
+			#print(j)
+	# for i in vectors:
+	# 	print(i)
 	sum3 = sum3MMD(vectors, len(vectors))
 
 	for ct in trange(nbPrototypes) :
@@ -135,7 +140,7 @@ def changePrototypesFormat(proto):
 	# 	print(classifiedProto[i])
 	return classifiedUtt,classifiedProto
 
-def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="euclidienne",groupSize=10,reducted=True):
+def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="euclidienne",groupSize=10,reducted=False):
 	sizeTot=len(classifiedVectors)
 	groupNb=sizeTot/groupSize
 	groupNb=math.ceil(groupNb)
@@ -180,7 +185,6 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 			MMD=[]
 			for i in range(len(newvectors[ct])):
 				z.append(newvectors[ct][i])
-				#print(z)
 				mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
 				z.pop()
 				MMD.append(mmd2)

@@ -136,9 +136,9 @@ def rePlot(spk):
 					legend="dist with criticism:"+str(round(d,2))
 					plt.plot([],[],color='white',label=legend)
 				s=0
-				if len(x)>0:
+				if len(x)>0 and len(p[0])<=2:
 					for i in range(len(x)):
-							s=s+math.dist(p[0],[x[i],y[i]])
+						s=s+math.dist(p[0],[x[i],y[i]])
 					d=s/len(x)
 					legend="mean dist:"+str(round(d,2))
 					plt.plot([],[],color='white',label=legend)
@@ -379,32 +379,37 @@ def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 	if (show==True):
 		plot.show()
 
+def findSpkInUtt(spk):
+	for i in range(len( uttOrdered)):
+		if run.uttToSpk(uttOrdered[i][0])==spk:
+			return i
+
 def autoScaleFunction(proto,crit,size):
 	autoScale=[]
-	base = size
-	maxSize = size * 2
+	min = size*0.75
+	maxSize = size * 3
 	maxDist = 0
 	spk=[]
 
 	for i in range(len(proto)):
-		for j in range(len(crit)):
-			spkP=run.uttToSpk(proto[i][0])
-			spkC=run.uttToSpk(crit[j][0])
-			if spkC==spkP and spkP not in spk:
-				d=math.dist(proto[i][1:],crit[j][1:])
-				if d>maxDist:
-					maxDist=d
-
-
+		spkP = run.uttToSpk(proto[i][0])
+		z=findSpkInUtt(spkP)
+		d=0
+		for j in range(len(xyzOrdered[z])):
+			d=d+math.dist(proto[i][1:],xyzOrdered[z][j])
+		d=d/len(xyzOrdered[z])
+		if d>maxDist:
+			maxDist=d
 	for i in range(len(proto)):
-		for j in range(len(crit)):
-			spkP=run.uttToSpk(proto[i][0])
-			spkC=run.uttToSpk(crit[j][0])
-			if spkC==spkP and spkP not in spk:
-				d=math.dist(proto[i][1:],crit[j][1:])
-				spk.append(spkP)
-				d=(d*maxSize)/maxDist
-				autoScale.append(d)
+		spkP = run.uttToSpk(proto[i][0])
+		z=findSpkInUtt(spkP)
+		d=0
+		for j in range(len(xyzOrdered[z])):
+			d=d+math.dist(proto[i][1:],xyzOrdered[z][j])
+		d=d/len(xyzOrdered[z])
+		d2=(d*maxSize)/maxDist
+		#print(d,"  ",d2)
+		autoScale.append(d2)
 	return autoScale
 
 def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
@@ -455,7 +460,6 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 		#c = xyzOrdered[i[0]][i[1]]
 		xc.append(i[1])  # add the utt
 		yc.append(i[2])
-	print(len(xp))
 	autoScale=[]
 	if autoScaleDot:
 		autoScale=autoScaleFunction(lPrototypes,lCriticisms,protoSize)
@@ -486,7 +490,7 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 	if (show==True):
 	 	plot.show()
 
-def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir=""):
+def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -550,7 +554,7 @@ def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlot
 	if (show==True):
 		plt.show()
 
-def create3DPlot(utt,xyz,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir=""):
+def create3DPlot(utt,xyz,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir="",detailSpeakerClick=True):
 	setSound(soundsdir)
 	fig = plt.figure()
 	colors, newutt = chooseColor2(xyz, utt)

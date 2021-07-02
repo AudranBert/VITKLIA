@@ -45,8 +45,7 @@ saveLdaModelFile: "ldaModel"
 # loading the LDA model
 loadLdaModelFile: "ldaModel"
 
-# no reduction	(mode=read)
-#readingFile: emb2D.txt
+
 
 # plot properties
 # file to save the plot
@@ -63,14 +62,14 @@ dotLineWidth: 0.25
 protoSize: 25
 # size of the edge of the prototype and the criticism (default=1) 
 protoLineWidth: 1.25
-oneDotPerSpeaker: true
+oneDotPerSpeaker: false
 detailSpeakerClick: true
 
 # prototypes
 # calculate prototypes and criticisms if true
 findProto: true
 eachSpeaker: true
-nbProto: 2
+nbProto: 1
 # if find proto is true, choose before or after UMAP
 afterReduction: true
 # define the distance calculation
@@ -78,12 +77,17 @@ kernel: euclidienne
 # if find proto is true, calculate the distance between prototypes and criticisms
 gridSearch: false
 
+# no reduction  (mode=read)
+# reading proto and crit
 readingProto: true
+# save files or not (if mode==reduction)
 saveFiles: True
+# files names 
 protoFile: proto.txt
 critFile: crit.txt
 uttFile: utt.txt
 
 
 reducedUtterances: true
+# number of speaker in a group for calculating prototypes and criticisms
 groupSize: 20

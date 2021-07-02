@@ -225,19 +225,20 @@ if __name__ == "__main__":
                 vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
                 i = mode.index("LDA")
                 del mode[i]
+            classifiedUtt, classifiedVectors = classify(utt, vectors)
             if yaml_content.get("eachSpeaker"):
-                newutt, newvectors = classify(utt, vectors)
-                lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(newutt,
-                                                                                                              newvectors,
-                                                                                                              yaml_content.get(
-                                                                                                                  "nbProto"),
-                                                                                                              yaml_content.get(
-                                                                                                                  "gridSearch"),
-                                                                                                              yaml_content.get(
-                                                                                                                  "kernel"))
+                if yaml_content.get("reducedUtterances"):
+                    lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(
+                        classifiedUtt, classifiedVectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
+                        yaml_content.get("kernel"), yaml_content.get("groupSize"))
+                else:
+                    lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(
+                        classifiedUtt, classifiedVectors, yaml_content.get("nbProto"),
+                        yaml_content.get("gridSearch"), yaml_content.get("kernel"))
+                #lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(newutt, newvectors,  yaml_content.get("nbProto"),yaml_content.get( "gridSearch"),yaml_content.get("kernel"))
             else:
-                classifiedVectors, lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
-                    utt, vectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
+                lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
+                    classifiedUtt, classifiedVectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
                     yaml_content.get("kernel"))
 
             # if "LDA" in mode and "UMAP" not in mode:
@@ -282,8 +283,8 @@ if __name__ == "__main__":
     if (yaml_content.get("findProto") and mode!="read") or (yaml_content.get("readingProto") and mode == "read"):
         if not (yaml_content.get("readingProto")) or mode != "read":
             if (yaml_content.get("afterReduction")):
+                classifiedUtt, classifiedVectors = classify(utt, vectors)
                 if yaml_content.get("eachSpeaker"):
-                    classifiedUtt, classifiedVectors = classify(utt, vectors)
                     if yaml_content.get("reducedUtterances"):
                         lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(
                         classifiedUtt, classifiedVectors,yaml_content.get("nbProto"), yaml_content.get("gridSearch"), yaml_content.get("kernel"),yaml_content.get("groupSize"))
@@ -292,9 +293,8 @@ if __name__ == "__main__":
                             classifiedUtt, classifiedVectors, yaml_content.get("nbProto"),
                             yaml_content.get("gridSearch"), yaml_content.get("kernel"))
                 else:
-                    classifiedUtt, classifiedVectors = classify(utt, vectors)
                     lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
-                        utt, vectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
+                        classifiedUtt, classifiedVectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
                         yaml_content.get("kernel"))
             if (yaml_content.get("saveFiles")):
                 if saveProtoFile != "" and saveCritFile != "" and saveUttFile != "":
