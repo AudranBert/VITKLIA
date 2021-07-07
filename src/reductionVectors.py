@@ -11,6 +11,17 @@ import pickle
 from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 
 def ldaMethod(utt,vectors,mode,dimension,load=False,saveModel="",loadModel=""):
+    '''
+    use LDA
+    :param utt:
+    :param vectors:
+    :param mode:
+    :param dimension:
+    :param load:
+    :param saveModel:
+    :param loadModel:
+    :return:
+    '''
     embedding=[]
     if "UMAP" not in mode:
         print("LDA with reduction")
@@ -60,6 +71,17 @@ def ldaMethod(utt,vectors,mode,dimension,load=False,saveModel="",loadModel=""):
     return embedding
 
 def umapMethod(vectors,dimension,n_neighbor,min_dist,load,saveModel,loadModel):
+    '''
+    use UMAP to reduce
+    :param vectors:
+    :param dimension:
+    :param n_neighbor:
+    :param min_dist:
+    :param load:
+    :param saveModel:
+    :param loadModel:
+    :return:
+    '''
     embedding=[]
     print("UMAP reduction")
     if load and os.path.isfile(loadModel):
@@ -94,24 +116,18 @@ def printAll(utt,vectors):
 
 def reduce(utt,vectors,reductionMethod,fileToExport,dimension,n_neighbor=15,min_dist=0.1,loadUmap=False,saveUmapModel="",loadUmapModel="",loadLda=False,saveLdaModel="",loadLdaModel="",option="",number=0):
     '''
-    transform vectors into 2D or 3D vectors
+    transform vectors into 2D or 3D vectors depending of the method
     :param filePath:
     :param fileToExport:
     :return utt:
     :return embedding:
     '''
     print("Reduction of embeddings...")
-
-
     if option!="":
         lpos = xvectorsParser.getExtent(vectors,option,number)
         vectors=xvectorsParser.removeVariables(vectors,lpos)
     else:
         print("no option")
-    #printAll(utt,vectors)
-    #reducer=umap.UMAP()
-    #scaled_vectors = umap.StandardScaler().fit_transform(vectors)
-    #embedding = reducer.fit_transform(scaled_vectors)
     print(fileToExport)
     if dimension==2 or dimension==3:
         embedding = []
@@ -121,6 +137,7 @@ def reduce(utt,vectors,reductionMethod,fileToExport,dimension,n_neighbor=15,min_
             vectors=embedding
         if "UMAP" in method:
             embedding=umapMethod(vectors,dimension,n_neighbor,min_dist,loadUmap,saveUmapModel,loadUmapModel)
+
         #printAll(utt,embedding)
         fileManager.exportData(utt, embedding, fileToExport)      # save 2D vectors
         return utt,embedding

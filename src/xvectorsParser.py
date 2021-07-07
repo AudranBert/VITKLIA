@@ -31,6 +31,13 @@ def readVectors(filePath):
     return utt,vectors
 
 def getListMin(list, number,debug=False):
+    '''
+    return x min where x is number
+    :param list:
+    :param number:
+    :param debug:
+    :return:
+    '''
     lmin = []
     lpos=[]
     sumMin=0
@@ -49,6 +56,13 @@ def getListMin(list, number,debug=False):
     return lmin,lpos,sumMin
 
 def getListMax(list, number,debug=False):
+    '''
+    return number max
+    :param list:
+    :param number:
+    :param debug:
+    :return:
+    '''
     lmax = []
     lpos=[]
     sumMax=0
@@ -67,6 +81,13 @@ def getListMax(list, number,debug=False):
     return lmax,lpos,sumMax
 
 def getSup(list,value,debug=False):
+    '''
+    get the number of dimension where extent are above a value
+    :param list:
+    :param value:
+    :param debug:
+    :return:
+    '''
     meansup1=0
     m=0
     ctInf=0
@@ -86,6 +107,14 @@ def getSup(list,value,debug=False):
     print("moyenne des variables avec etendue sup a ",value,": ",meansup1)
 
 def getInfos(extend,vectors,plot=False,debug=False):
+    '''
+    give infos about dimensions of vectors
+    :param extend:
+    :param vectors:
+    :param plot:
+    :param debug:
+    :return:
+    '''
     sumExtend=0
     for i in range(0,len(extend)):
         sumExtend+=extend[i]
@@ -115,6 +144,14 @@ def getInfos(extend,vectors,plot=False,debug=False):
     prepBarPlot(extend,"Bar plot of the extend of the variables")
 
 def getExtent(vectors,option,qtt,debug=False):
+    '''
+    extent calculation
+    :param vectors:
+    :param option:
+    :param qtt:
+    :param debug:
+    :return:
+    '''
     min=[]
     max=[]
     for i in range(0,len(vectors)):
@@ -197,6 +234,12 @@ def plot(bar,value,title="plot",ylabel="Number of variables",xlabel="Value of th
     plt.show()
 
 def removeVariables(vectors,lpos):
+    '''
+    remove the given dimensions
+    :param vectors:
+    :param lpos:
+    :return:
+    '''
     newVectors=[]
     for i in range(0,len(vectors)):
         newVectors.append([])

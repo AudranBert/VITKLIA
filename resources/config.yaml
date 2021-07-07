@@ -15,13 +15,13 @@ mode: "reduction"
 # LDA or UMAP or LDA,UMAP
 reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: /dataset/Spk/train_data/xvectors.txt
+xvectorsFile: /dataset/Spk/test_data/xvectors.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
 variablesSelectionNumber: 20
 # file to store the reducted vectors
-exportReductionFile: emb2DTEST.txt
+#exportReductionFile: emb2DTEST.txt
 
 # UMAP
 # number of dimension

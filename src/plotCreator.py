@@ -35,6 +35,8 @@ uttOrdered=[]
 lPrototypes=None
 lCriticisms=None
 
+cp=[0.05,0.1,0.15,0.2,0.25,0.3,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1]
+
 def callback(in_data, frame_count, time_info, status):
     data = wf.readframes(frame_count)
     return (data, pyaudio.paContinue)
@@ -70,6 +72,13 @@ def setSound(dir):
 
 
 def playSound(i,xy,utt):
+	'''
+	play a sound depending of the id
+	:param i:
+	:param xy:
+	:param utt:
+	:return:
+	'''
 	global stream
 	global wf
 	global p
@@ -93,6 +102,11 @@ def playSound(i,xy,utt):
 
 
 def rePlot(spk):
+	'''
+	plot only one speaker
+	:param spk:
+	:return:
+	'''
 	if plot!=None:
 		fig, ax = plot.subplots()
 		x=[]
@@ -159,6 +173,12 @@ def rePlot(spk):
 		# plot.show()
 
 def find3DCoords(event, ax):
+	'''
+	find where the mouse is in 3D
+	:param event:
+	:param ax:
+	:return:
+	'''
 	pressed = ax.button_pressed
 	ax.button_pressed = -1  # some value that doesn't make sense.
 	coords = ax.format_coord(event.xdata, event.ydata)  # coordinates string in the form x=value, y=value, z= value
@@ -168,7 +188,15 @@ def find3DCoords(event, ax):
 	print(res)
 	return res
 
-def onclick2DOpenNewPlot(event,ax,xy,utt):		#click on the plot
+def onclick2DOpenNewPlot(event,ax,xy,utt):
+	'''
+	when click on a dot create a new plot with only the speaker
+	:param event: 
+	:param ax: 
+	:param xy: 
+	:param utt: 
+	:return: 
+	'''
 	global plot
 	if event.inaxes!=None:	#inside the plot
 		print("The click : ",event.xdata," ",event.ydata)
@@ -194,6 +222,14 @@ def onclick2DOpenNewPlot(event,ax,xy,utt):		#click on the plot
 			rePlot(spk[0])
 
 def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
+	'''
+	when click on a dot play the corresponding sound
+	:param event: 
+	:param ax: 
+	:param xy: 
+	:param utt: 
+	:return: 
+	'''
 	global plot
 	if event.inaxes!=None:	#inside the plot
 		print("The click : ",event.xdata," ",event.ydata)
@@ -219,6 +255,14 @@ def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
 
 	
 def onclick3D(event,ax,xyz,utt):		#click on the plot
+	'''
+	when click on 3D plot play the corresponding sound
+	:param event: 
+	:param ax: 
+	:param xyz: 
+	:param utt: 
+	:return: 
+	'''
 	if event.inaxes!=None:	#inside the plot
 		coords=find3DCoords(event, ax)
 		point=-1
@@ -244,6 +288,12 @@ def onclick3D(event,ax,xyz,utt):		#click on the plot
 
 
 def chooseColor(xy,utt):
+	'''
+	choose a color for each speaker and order it by speaker
+	:param xy:
+	:param utt:
+	:return:
+	'''
 	colors=[]
 	loc=[]
 	newXY=[]
@@ -264,7 +314,7 @@ def chooseColor(xy,utt):
 			loc.append(id)
 			# if (rgb+1>=255):
 			# 	rgb=0
-			rgb=(random.uniform(0.05,1),random.uniform(0.05,1),random.uniform(0.05,1))
+			rgb=(random.choice(cp),random.choice(cp),random.choice(cp))
 			colors.append(rgb)
 			newXY.append([])
 			newXY[-1].append(xy[ctutt])
@@ -277,6 +327,12 @@ def chooseColor(xy,utt):
 	return colors,newXY,loc
 
 def chooseColor2(xy,utt):
+	'''
+	choose a color for each speaker
+	:param xy:
+	:param utt:
+	:return:
+	'''
 	colors=[]
 	loc=[]
 	newXY=[]
@@ -291,6 +347,15 @@ def chooseColor2(xy,utt):
 	return colors,xy,utt
 
 def chooseColorProto(utt,xy,colors,proto,crit):
+	'''
+	found the corresponding colors for prototypes and criticisms
+	:param utt:
+	:param xy:
+	:param colors:
+	:param proto:
+	:param crit:
+	:return:
+	'''
 	colorsProto=[]
 	colorsCrit=[]
 	for i in proto:
@@ -310,6 +375,11 @@ def chooseColorProto(utt,xy,colors,proto,crit):
 	return colorsProto,colorsCrit
 
 def checkDir(path):
+	'''
+	check if a directory exist or not
+	:param path:
+	:return:
+	'''
 	p=path.split("/")
 	p.pop()
 	np=""
@@ -322,6 +392,18 @@ def checkDir(path):
 		return False
 
 def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW=1,soundsdir="",detailSpeakerClick=True):
+	'''
+	create a 2D plot
+	:param utt2D:
+	:param xy:
+	:param show:
+	:param filePlotExport:
+	:param dotS:
+	:param dotLineW:
+	:param soundsdir:
+	:param detailSpeakerClick:
+	:return:
+	'''
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -380,11 +462,23 @@ def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 		plot.show()
 
 def findSpkInUtt(spk):
+	'''
+	find a given speaker in the uttOrdered list
+	:param spk:
+	:return:
+	'''
 	for i in range(len( uttOrdered)):
 		if run.uttToSpk(uttOrdered[i][0])==spk:
 			return i
 
 def autoScaleFunction(proto,crit,size):
+	'''
+	scale the size of prototypes depending of the mean dist of the dot speaker with it
+	:param proto:
+	:param crit:
+	:param size:
+	:return:
+	'''
 	autoScale=[]
 	min = size*0.75
 	maxSize = size * 3
@@ -413,6 +507,24 @@ def autoScaleFunction(proto,crit,size):
 	return autoScale
 
 def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
+	'''
+	create a 2D plot with prototypes and criticisms
+	:param utt2D:
+	:param xy:
+	:param prototypes:
+	:param criticisms:
+	:param show:
+	:param filePlotExport:
+	:param dotS:
+	:param protoS:
+	:param dotLineW:
+	:param protoLineW:
+	:param soundsdir:
+	:param oneDotPerSpeaker:
+	:param detailSpeakerClick:
+	:param autoScaleDot:
+	:return:
+	'''
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -491,6 +603,24 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 	 	plot.show()
 
 def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
+	'''
+	create a 3D plot with prototypes and criticisms
+	:param utt3D:
+	:param xyz3D:
+	:param prototypes:
+	:param criticisms:
+	:param show:
+	:param filePlotExport:
+	:param dotSize:
+	:param protoSize:
+	:param dotLineWidth:
+	:param protoLineWidth:
+	:param soundsdir:
+	:param oneDotPerSpeaker:
+	:param detailSpeakerClick:
+	:param autoScaleDot:
+	:return:
+	'''
 	global plot
 	global colorsOrdered
 	global xyzOrdered
@@ -555,6 +685,17 @@ def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlot
 		plt.show()
 
 def create3DPlot(utt,xyz,show=False,filePlotExport="plot.jpeg",dotSize=20,soundsdir="",detailSpeakerClick=True):
+	'''
+	create a 3D plot
+	:param utt:
+	:param xyz:
+	:param show:
+	:param filePlotExport:
+	:param dotSize:
+	:param soundsdir:
+	:param detailSpeakerClick:
+	:return:
+	'''
 	setSound(soundsdir)
 	fig = plt.figure()
 	colors, newutt = chooseColor2(xyz, utt)

@@ -60,6 +60,15 @@ def errorExit(msg, code=-1):
 
 
 def autoName(plotFile, dimension, reductionMethod, intra, inter):
+    '''
+    create a name for the plot depending of parameters
+    :param plotFile:
+    :param dimension:
+    :param reductionMethod:
+    :param intra:
+    :param inter:
+    :return: the name of the plot
+    '''
     f = plotFile.split("/")
     f.pop()
     path = ""
@@ -91,6 +100,11 @@ def autoName(plotFile, dimension, reductionMethod, intra, inter):
 
 
 def classify(utt, vectors):
+    '''
+    :param utt: list of utterance id
+    :param vectors: list of utterance
+    :return: list of list, each list is one speaker
+    '''
     loc = []
     nutt = []
     newutt = []
@@ -117,12 +131,16 @@ def classify(utt, vectors):
     return nutt,newutt
 
 def uttToSpk(id):
+    '''
+    :param id: an utterance id
+    :return: return the id speaker
+    '''
     spk=id.split("-")
     return spk[0]
 
 def readConf(fileName):
     '''
-    read the configuration file
+    read the configuration file and return file names
     :param fileName:
     :return:
     '''
@@ -155,7 +173,7 @@ def readConf(fileName):
     else:
         print("no mode defined")
     xvectorsFile = yaml_content.get("xvectorsFile")
-    exportReductionFile = yaml_content.get("exportReductionFile")
+    #exportReductionFile = yaml_content.get("exportReductionFile")
     readingFile = yaml_content.get("readingFile")
     filePlotExport = yaml_content.get("plotFile")
     sounds = yaml_content.get("sounds_dir")
@@ -185,7 +203,7 @@ def readConf(fileName):
     if saveUttFile != "":
         saveUttFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("uttFile")
     xvectorsFile = resources + os.path.sep + xvectorsFile
-    exportReductionFile = resources + os.path.sep + exportReductionFile
+    #exportReductionFile = resources + os.path.sep + exportReductionFile
     #readingFile = resources + os.path.sep + readingFile
     filePlotExport = resources + os.path.sep + filePlotExport
     f = filePlotExport.split("/")
@@ -199,14 +217,16 @@ def readConf(fileName):
 
 
 if __name__ == "__main__":
+    '''
+    main
+    '''
     parser = argparse.ArgumentParser()
     parser.add_argument("--conf", default="", help="name of the config file")
     parser.add_argument("--mode", default="", help="mode")
     args = parser.parse_args()
-    # readConf(args.conf)
+
     yaml_content = readConf(args.conf)
-    # for key, value in yaml_content.items():
-    #     print(f"{key}: {value}")
+
     mode = mode.strip("\n")
     mode = mode.strip()
     lprototypes = []
@@ -235,47 +255,27 @@ if __name__ == "__main__":
                     lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(
                         classifiedUtt, classifiedVectors, yaml_content.get("nbProto"),
                         yaml_content.get("gridSearch"), yaml_content.get("kernel"))
-                #lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypesEachSpeaker(newutt, newvectors,  yaml_content.get("nbProto"),yaml_content.get( "gridSearch"),yaml_content.get("kernel"))
             else:
                 lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
                     classifiedUtt, classifiedVectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
                     yaml_content.get("kernel"))
-
-            # if "LDA" in mode and "UMAP" not in mode:
-            #     vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
-            #     i = mode.index("LDA")
-            #     del mode[i]
-        utt, vectors = reductionVectors.reduce(utt, vectors, mode, exportReductionFile,
+        utt, vectors = reductionVectors.reduce(utt, vectors, mode, saveUttFile,
                                                int(yaml_content.get("dimension")), yaml_content.get("n_neighbor"),
                                                yaml_content.get("min_dist"), yaml_content.get("loadUmapModel"),
                                                saveUmapModelFile, loadUmapModelFile, yaml_content.get("loadLdaModel"),
                                                saveLdaModelFile, loadLdaModelFile,
                                                yaml_content.get("variableSelectionOption"),
                                                yaml_content.get("variablesSelectionNumber"))
-        utt, vectors = load(exportReductionFile)
+        utt, vectors = fileManager.readUtt(saveUttFile)
     elif (mode == "read"):  # reading mode
-        # if not os.path.isfile(readingFile):  # check if conf file exist
-        #     errorExit("File : " + readingFile + " does not exist")
-        # utt,vectors=load(readingFile)
         if (yaml_content.get("readingProto")):
             print("reading files...")
             utt, vectors, lprototypes, lcriticisms = fileManager.readFiles(saveUttFile, saveProtoFile, saveCritFile)
-            # for i in range(len(vectors)):
-            #     print(utt[i],end='')
-            #     print(vectors[i])
-            # for i in range(len(classifiedVectors)):
-            #     print(len(classifiedVectors[i]))
-            #     for j in range(len(classifiedVectors[i])):
-            #         print(classifiedUtt[i][j], end='')
-            #         print(classifiedVectors[i][j])
-            # print(len(vectors))
         else:
             utt, vectors = fileManager.readUtt(saveUttFile)
         classifiedUtt, classifiedVectors = classify(utt, vectors)
     else:
         errorExit("Mode invalid")
-    # #print(len(vectors[0]))
-    # #prototypes.classify(vectors,utt)
     dimension = 2
 
     if len(vectors) > 0 and len(vectors[0]) == 3:
@@ -316,7 +316,6 @@ if __name__ == "__main__":
                                                yaml_content.get("protoLineWidth"), sounds,
                                                yaml_content.get("oneDotPerSpeaker"),
                                                yaml_content.get("detailSpeakerClick"))
-            # plotCreator.create2DPlot(vectors,utt,showPlot,filePlotExport,dotSize)
     else:
         classifiedUtt,classifiedVectors = classify(utt, vectors)
         if (yaml_content.get("autoNamePlot")):
@@ -329,4 +328,3 @@ if __name__ == "__main__":
             plotCreator.create2DPlot(classifiedUtt,classifiedVectors, yaml_content.get("showPlot"), filePlotExport,
                                      yaml_content.get("dotSize"), yaml_content.get("dotLineWidth"), sounds,
                                      yaml_content.get("detailSpeakerClick"))
-    # print(vectors.shape)

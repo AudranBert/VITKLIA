@@ -6,6 +6,11 @@ import sys
 
 
 def getInfos(fileName):
+    '''
+    give infos about a dataset
+    :param fileName: the path of the feats.scp file
+    :return:
+    '''
     nbSpeaker=0
     nbUtt=0
     nbUttMinPerSpeaker=-1
