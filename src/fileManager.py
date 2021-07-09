@@ -114,6 +114,25 @@ def exportUtt(utt,vectors,vectorFile):
 	file.close()
 
 
+def exportData(utt,data, file):
+	'''
+	save utt and vectors
+	:param utt:
+	:param data:
+	:param file:
+	:return:
+	'''
+	file1 = open(file, 'w')
+	ct=0
+	for i in data:
+		file1.write(utt[ct]+" ") 	# write uttId
+		for j in i:					# write vectors
+			s = str(j) + " "
+			file1.write(s)
+		file1.write("\n")
+		ct+=1
+	file1.close()
+
 if __name__ == "__main__":
 	print("Reading")
 

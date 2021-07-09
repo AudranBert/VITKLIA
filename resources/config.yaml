@@ -15,7 +15,7 @@ mode: "reduction"
 # LDA or UMAP or LDA,UMAP
 reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: /dataset/Spk/test_data/xvectors.txt
+xvectorsFile: /files/SET1/xvectorsS1T6.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
@@ -31,11 +31,11 @@ n_neighbor: 15
 # min_dist (default 0.1)
 min_dist: 0.1
 # if true load the UMAP model
-loadUmapModel: true
+loadUmapModel: false
 # saving the UMAP model
-saveUmapModelFile: "umapModel"
+saveUmapModelFile: "/SET1Reducted/UMAP_Creating/umapModelS1T6"
 # loading the UMAP model
-loadUmapModelFile: "umapModel"
+loadUmapModelFile: "/SET1Reducted/umapModelS1"
 
 # LDA
 # if true load the LDA model
@@ -53,7 +53,7 @@ plotFile: plot/test.jpg
 # Activate the plot autonaming
 autoNamePlot: false
 # showing the plot or not
-showPlot: True
+showPlot: true
 # size of the dot (default=15) 
 dotSize: 10
 # size of the edge of the dot (default=0.5) 
@@ -83,9 +83,9 @@ readingProto: true
 # save files or not (if mode==reduction)
 saveFiles: True
 # files names 
-protoFile: proto.txt
-critFile: crit.txt
-uttFile: utt.txt
+protoFile: "/SET1Reducted/UMAP_Creating/S1T6proto.txt"
+critFile: "/SET1Reducted/UMAP_Creating/S1T6crit.txt"
+uttFile: "/SET1Reducted/UMAP_Creating/S1T6utt.txt"
 
 
 reducedUtterances: true

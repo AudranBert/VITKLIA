@@ -1,0 +1,40 @@
+# resources
+# folder where the program search files
+resources_dir: "../resources"
+file_dir: "files/SET1Reducted/UMAP_Creating"
+# folder where the program search sounds 
+sounds_dir: "../resources/sounds"
+
+# no reduction  (mode=read)
+# reading proto and crit
+readingProto: true
+# save files or not (if mode==reduction)
+# files names 
+protoFileSet0: "S1T1proto.txt"
+critFileSet0: "S1T1crit.txt"
+uttFileSet0: "S1T1utt.txt"
+# files names 
+protoFileSet1: "S1T2proto.txt"
+critFileSet1: "S1T2crit.txt"
+uttFileSet1: "S1T2utt.txt"
+showPrint: false
+
+# plot properties
+# file to save the plot
+plotFile0: plot/SET0.jpg
+plotFile1: plot/SET1.jpg
+# Activate the plot autonaming
+autoNamePlot: false
+# showing the plot or not
+showPlot: true
+# size of the dot (default=15) 
+dotSize: 20
+# size of the edge of the dot (default=0.5) 
+dotLineWidth: 0.25
+# size of the prototype and the criticism (default=20) 
+protoSize: 25
+# size of the edge of the prototype and the criticism (default=1) 
+protoLineWidth: 1.25
+oneDotPerSpeaker: false
+detailSpeakerClick: false
+scalePrototypes: false

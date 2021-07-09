@@ -3,7 +3,7 @@ import os.path
 
 from playsound import playsound
 
-voxceleb="voxceleb1"
+pathToWav="data/wav/voxceleb/"
 
 def getFile(pathToWav,id):
     '''
@@ -39,7 +39,7 @@ def getFileWithPathToData(path,id):
     '''
     cwd = os.getcwd()       # get current path
     #pathToStklia="path"
-    pathToData=path+os.path.sep+"data"+os.path.sep+"wav"+os.path.sep+voxceleb+os.path.sep     #path to Voxceleb1
+    pathToData=path+os.path.sep     #path to Voxceleb1
     #print(cwd)
     path=getFile(pathToData,id)     # path of the wav
     return path

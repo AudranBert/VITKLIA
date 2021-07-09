@@ -45,16 +45,17 @@ def pyAudioStarting(file):
 	global stream
 	global wf
 	global paudio
-	print("start")
-	wf = wave.open(file, 'rb')
-	paudio = pyaudio.PyAudio()
-	stream = paudio.open(format=paudio.get_format_from_width(wf.getsampwidth()),
-					channels=wf.getnchannels(),
-					rate=wf.getframerate(),
-					output=True,
-					stream_callback=callback
-					)
-	stream.start_stream()
+	print("start ",file)
+	if os.path.isfile(file):
+		wf = wave.open(file, 'rb')
+		paudio = pyaudio.PyAudio()
+		stream = paudio.open(format=paudio.get_format_from_width(wf.getsampwidth()),
+						channels=wf.getnchannels(),
+						rate=wf.getframerate(),
+						output=True,
+						stream_callback=callback
+						)
+		stream.start_stream()
 
 def setOptions(dotS=20,dotLineW=1,protoS=-1,protoLineW=-1):
 	global dotSize
@@ -83,7 +84,7 @@ def playSound(i,xy,utt):
 	global wf
 	global p
 	if (i != None and i!=-1):  # if a point have been found
-		print(i)
+		#print(i)
 		spk=utt[i[0]][i[1]].split("-")
 		print("The point is :", xy[i[0]][i[1]])
 		print("The speaker is :",spk[0])
@@ -96,8 +97,12 @@ def playSound(i,xy,utt):
 			paudio.terminate()
 			print("stop")
 		#if (i <= len(utt)):  # if a sound exist
-		#	print(wavLink.getFileWithPathToData(sounds_dir,utt[i]))
+
+		#print(wavLink.getFileWithPathToData(sounds_dir,utt[i]))
 			#playsound(s[i])
+		thesound=wavLink.getFileWithPathToData(sounds_dir, utt[i[0]][i[1]])
+		if thesound!=None:
+			pyAudioStarting(thesound)
 		#pyAudioStarting("../resources/sounds/1.wav")
 
 
@@ -391,7 +396,7 @@ def checkDir(path):
 		print("Directory :"+np+" does not exist")
 		return False
 
-def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW=1,soundsdir="",detailSpeakerClick=True):
+def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW=1,soundsdir="",detailSpeakerClick=True,title="Plot"):
 	'''
 	create a 2D plot
 	:param utt2D:
@@ -454,7 +459,7 @@ def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 	plot.xlabel("X")
 	plot.ylabel("Y")
 	plot.legend(loc='upper left')
-	plot.title("PLOT")
+	plot.title(title)
 	if checkDir(filePlotExport):
 		plot.savefig(filePlotExport,dpi=1920)
 		print("Plot save to", filePlotExport)
@@ -506,7 +511,7 @@ def autoScaleFunction(proto,crit,size):
 		autoScale.append(d2)
 	return autoScale
 
-def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
+def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True,title="Plot"):
 	'''
 	create a 2D plot with prototypes and criticisms
 	:param utt2D:
@@ -593,7 +598,7 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 	plot.xlabel("X")
 	plot.ylabel("Y")
 	#plot.legend(loc='upper left')
-	plot.title("PLOT")
+	plot.title(title)
 
 	if checkDir(filePlotExport):
 		plot.savefig(filePlotExport,dpi=1920)
@@ -601,6 +606,7 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 	#plot.ioff()
 	if (show==True):
 	 	plot.show()
+	return plot
 
 def create3DPlotPrototypes(utt3D,xyz3D,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotSize=20,protoSize=25,dotLineWidth=1,protoLineWidth=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True):
 	'''
