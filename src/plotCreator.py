@@ -511,7 +511,7 @@ def autoScaleFunction(proto,crit,size):
 		autoScale.append(d2)
 	return autoScale
 
-def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=True,detailSpeakerClick=True,autoScaleDot=True,title="Plot"):
+def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=False,detailSpeakerClick=True,autoScaleDot=False,title="Plot"):
 	'''
 	create a 2D plot with prototypes and criticisms
 	:param utt2D:
@@ -578,6 +578,12 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 		xc.append(i[1])  # add the utt
 		yc.append(i[2])
 	autoScale=[]
+	# if colorsProto==None or len(colorsProto)==0:
+	# 	rgb = (random.choice(cp), random.choice(cp), random.choice(cp))
+	# 	for i in range(len(xp)):
+	# 		colorsProto.append(rgb)
+	# 	for i in range(len(xc)):
+	# 		colorsCrit.append(rgb)
 	if autoScaleDot:
 		autoScale=autoScaleFunction(lPrototypes,lCriticisms,protoSize)
 	for i in range (len(xc)):
