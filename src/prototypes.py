@@ -58,6 +58,7 @@ def sum3MMD(x, n):
 			elif kernelMode=="test":
 				sum = sum + kernelTest(x[i], x[j])
 			else:
+				print(x[i])
 				sum = sum + kernelEuclidienne(x[i], x[j])
 	return (1/(n*n))*sum
 
@@ -140,7 +141,7 @@ def changePrototypesFormat(proto):
 	# 	print(classifiedProto[i])
 	return classifiedUtt,classifiedProto
 
-def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="euclidienne",groupSize=10,reducted=False):
+def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="euclidienne",groupSize=10,gmm=None,reducted=False):
 	sizeTot=len(classifiedVectors)
 	groupNb=sizeTot/groupSize
 	groupNb=math.ceil(groupNb)
@@ -155,7 +156,7 @@ def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="eu
 				subVectors.append(classifiedVectors[ct])
 				subUtt.append(classifiedUtt[ct])
 				ct+=1
-		subProto,subCrit,g,g2=prototypesEachSpeaker(subUtt,subVectors,nbPrototypes,grid,kernelM)
+		subProto,subCrit,g,g2=prototypesEachSpeaker(subUtt,subVectors,nbPrototypes,grid,kernelM,gmm)
 
 		for i in subProto:
 			lProto.append(i)
@@ -166,7 +167,7 @@ def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="eu
 		lProto,tmp,g,g2=prototypes(utt,vectors,10,grid,kernelM)
 	return lProto,lCrit,g,g2
 
-def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
+def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne",gmm=None):
 	global kernelMode
 	kernelMode=kernelM
 	print("Prototypes and criticisms...")
@@ -178,6 +179,8 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 	#ct=0
 	uttP=[]
 	uttC=[]
+
+
 	for ct in trange(nbPrototypesTot) :
 		sum3 = sum3MMD(newvectors[ct], len(newvectors[ct]))
 		for j in range(nbPrototypes):

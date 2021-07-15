@@ -42,10 +42,11 @@ def gmmSpk(list):
     return l
 
 def gmm(utt,vectors):
-    gm = GaussianMixture(n_components=50, random_state=0).fit(vectors)
+    n_clusters=10
+    gm = GaussianMixture(n_components=n_clusters, random_state=0).fit(vectors)
     l=gm.predict(vectors)
     lmean=[]
-    for i in range(50):
+    for i in range(n_clusters):
         ct=0
         lmean.append(["0",0,0,0])
         for j in range(len(l)):
@@ -53,13 +54,16 @@ def gmm(utt,vectors):
                 ct+=1
                 lmean[i][1]+=vectors[j][0]
                 lmean[i][2] += vectors[j][1]
-        lmean[i][1] = lmean[i][1]/ct
-        lmean[i][2] = lmean[i][2]/ct
-        lmean[i][3] = ct
-        p=findClose(vectors,lmean[i][1:3])
-        lmean[i][0]=utt[vectors.index(p)]
-    for i in range(len(lmean)):
-        print(i," : ",lmean[i])
+        if ct>0:
+            lmean[i][1] = lmean[i][1]/ct
+            lmean[i][2] = lmean[i][2]/ct
+            lmean[i][3] = ct
+            p=findClose(vectors,lmean[i][1:3])
+            lmean[i][0]=utt[vectors.index(p)]
+        else:
+            lmean.remove()
+    # for i in range(len(lmean)):
+    #     print(i," : ",lmean[i])
     return l,lmean
 
 if __name__ == "__main__":
@@ -69,11 +73,25 @@ if __name__ == "__main__":
     utt,vectors=fileManager.readUtt("../resources/files/utt.txt")
     v2=vectors[:]
     #utt,vectors=run.classify(utt, vectors)
-    l,lmean=gmm(utt,vectors)
-    utt,vectors=run.classify(utt,v2)
+    classifiedUtt, classifiedVectors = run.classify(utt, v2)
+    lgmm=[]
+    lgmmnb=[]
+    lutt=[]
+    for i in range(len(classifiedVectors)):
+        l,lmean=gmm(classifiedUtt[i],classifiedVectors[i])
+        lgmm.append([])
+        lutt.append([])
+        lgmmnb.append([])
+        for j in lmean:
+            lgmm[i].append(j[1:3])
+            lutt[i].append(j[0])
+            lgmmnb[i].append(j[3])
+    # for i in range(len(lgmm)):
+    #     print("speaker:",classifiedUtt[i][0])
+    #     print(lgmm[i][0])
     #for i in range(len(utt)):
      #   print(utt[i]," :",l[i] ," : ",vectors[i])
-
+    lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(lutt, lgmm, 1,False, "euclidienne",20,lgmmnb)
     # fig, ax = plt.subplots()
     # x = []
     # y = []
@@ -82,4 +100,4 @@ if __name__ == "__main__":
     #     y.append(i[1])
     # ax.scatter(x, y)
     # plt.show()
-    plotCreator.create2DPlotPrototypes(utt, vectors,lmean,[],True)
+    plotCreator.create2DPlotPrototypes(classifiedUtt, classifiedVectors,lprototypes,lcriticisms,True)
