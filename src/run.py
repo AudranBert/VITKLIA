@@ -138,6 +138,20 @@ def uttToSpk(id):
     spk=id.split("-")
     return spk[0]
 
+def convertProto(utt,vec,l):
+    newL=[]
+    for i in l:
+        for j in range(len(utt)):
+            if i[0] in utt[j]:
+                a = utt[j].index(i[0])
+                #print(vec[j][a])
+                newL.append([])
+                newL[-1].append(i[0])
+                for z in vec[j][a]:
+                    newL[-1].append(z)
+                break
+    return newL
+
 def readConf(fileName):
     '''
     read the configuration file and return file names
@@ -240,12 +254,13 @@ if __name__ == "__main__":
             errorExit("File : " + xvectorsFile + " does not exist")
         utt, vectors = xvectorsParser.readVectors(xvectorsFile)  # read xvectors
         mode = yaml_content.get("reductionMethod").split(",")
+        classifiedUtt, classifiedVectors = classify(utt, vectors)
         if (yaml_content.get("findProto") and not (yaml_content.get("afterReduction"))):
             if "LDA" in mode and "UMAP" in mode:
                 vectors = reductionVectors.ldaMethod(utt, vectors, mode, yaml_content.get("dimension"))
                 i = mode.index("LDA")
                 del mode[i]
-            classifiedUtt, classifiedVectors = classify(utt, vectors)
+
             if yaml_content.get("eachSpeaker"):
                 if yaml_content.get("reducedUtterances"):
                     lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(
@@ -282,8 +297,9 @@ if __name__ == "__main__":
         dimension = 3
     if (yaml_content.get("findProto") and mode!="read") or (yaml_content.get("readingProto") and mode == "read"):
         if not (yaml_content.get("readingProto")) or mode != "read":
+            classifiedUtt, classifiedVectors = classify(utt, vectors)
             if (yaml_content.get("afterReduction")):
-                classifiedUtt, classifiedVectors = classify(utt, vectors)
+
                 if yaml_content.get("eachSpeaker"):
                     if yaml_content.get("reducedUtterances"):
                         lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(
@@ -296,12 +312,16 @@ if __name__ == "__main__":
                     lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.prototypes(
                         classifiedUtt, classifiedVectors, yaml_content.get("nbProto"), yaml_content.get("gridSearch"),
                         yaml_content.get("kernel"))
+            else:
+                lprototypes=convertProto(classifiedUtt,classifiedVectors,lprototypes)
+                lcriticisms=convertProto(classifiedUtt,classifiedVectors,lcriticisms)
             if (yaml_content.get("saveFiles")):
                 if saveProtoFile != "" and saveCritFile != "" and saveUttFile != "":
                     fileManager.exportFiles(classifiedUtt, classifiedVectors, lprototypes, lcriticisms, saveUttFile,
                                             saveProtoFile, saveCritFile)
                 else:
                     print("You want to save files but at least one is not defined")
+
         if (yaml_content.get("autoNamePlot")):
             filePlotExport = autoName(yaml_content.get("plotFile"), dimension, yaml_content.get("reductionMethod"),
                                       gridSearchIntra, gridSearchInter)

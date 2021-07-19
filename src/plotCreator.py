@@ -193,7 +193,7 @@ def find3DCoords(event, ax):
 	print(res)
 	return res
 
-def onclick2DOpenNewPlot(event,ax,xy,utt):
+def onclick2DOpenNewPlot(event,ax,xy,utt,oneDotPerSpeaker=False):
 	'''
 	when click on a dot create a new plot with only the speaker
 	:param event: 
@@ -206,27 +206,29 @@ def onclick2DOpenNewPlot(event,ax,xy,utt):
 	if event.inaxes!=None:	#inside the plot
 		print("The click : ",event.xdata," ",event.ydata)
 		point=-1
+		minX = event.xdata - 0.5
+		maxX = event.xdata + 0.5
+		minY = event.ydata - 0.5
+		maxY = event.ydata + 0.5
 		for i in range (0,len(xy)):	#search the nearest point
 			for j in range(len(xy[i])):
-				minX=event.xdata-0.5
-				maxX=event.xdata+0.5
-				minY=event.ydata-0.5
-				maxY=event.ydata+0.5
-				if (xy[i][j][0]>=minX and xy[i][j][0]<=maxX and xy[i][j][1]>=minY and xy[i][j][1]<=maxY):	#near enough
-					if(point!=-1):		#if a point have been already found
-						#print(i," vs ",point)
-						distanceEvent=math.sqrt(pow(xy[i][j][0]-event.xdata,2)+pow(xy[i][j][1]-event.ydata,2))	#distance between the event and the point we are looking at
-						distancePoint=math.sqrt(pow(xy[point[0]][point[1]][0]-event.xdata,2)+pow(xy[point[0]][point[1]][1]-event.ydata,2))	#distance between the event and the closest pont we have found
-						#print(distanceEvent," vs ",distancePoint)
-						if(distancePoint>distanceEvent): 		#find the nearest
+				p=[utt[i][j],xy[i][j][0],xy[i][j][1]]
+				if not oneDotPerSpeaker or p in lPrototypes or p in lCriticisms:
+					if (xy[i][j][0]>=minX and xy[i][j][0]<=maxX and xy[i][j][1]>=minY and xy[i][j][1]<=maxY):	#near enough
+						if(point!=-1):		#if a point have been already found
+							#print(i," vs ",point)
+							distanceEvent=math.sqrt(pow(xy[i][j][0]-event.xdata,2)+pow(xy[i][j][1]-event.ydata,2))	#distance between the event and the point we are looking at
+							distancePoint=math.sqrt(pow(xy[point[0]][point[1]][0]-event.xdata,2)+pow(xy[point[0]][point[1]][1]-event.ydata,2))	#distance between the event and the closest pont we have found
+							#print(distanceEvent," vs ",distancePoint)
+							if(distancePoint>distanceEvent): 		#find the nearest
+								point=[i,j]
+						else:
 							point=[i,j]
-					else:
-						point=[i,j]
 		if point!=-1:
 			spk = utt[point[0]][point[1]].split("-")
 			rePlot(spk[0])
 
-def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
+def onclick2DPlaySound(event,ax,xy,utt,oneDotPerSpeaker=False):		#click on the plot
 	'''
 	when click on a dot play the corresponding sound
 	:param event: 
@@ -239,22 +241,24 @@ def onclick2DPlaySound(event,ax,xy,utt):		#click on the plot
 	if event.inaxes!=None:	#inside the plot
 		print("The click : ",event.xdata," ",event.ydata)
 		point=-1
+		minX = event.xdata - 0.5
+		maxX = event.xdata + 0.5
+		minY = event.ydata - 0.5
+		maxY = event.ydata + 0.5
 		for i in range (0,len(xy)):	#search the nearest point
 			for j in range(len(xy[i])):
-				minX=event.xdata-0.5
-				maxX=event.xdata+0.5
-				minY=event.ydata-0.5
-				maxY=event.ydata+0.5
-				if (xy[i][j][0]>=minX and xy[i][j][0]<=maxX and xy[i][j][1]>=minY and xy[i][j][1]<=maxY):	#near enough
-					if(point!=-1):		#if a point have been already found
-						#print(i," vs ",point)
-						distanceEvent=math.sqrt(pow(xy[i][j][0]-event.xdata,2)+pow(xy[i][j][1]-event.ydata,2))	#distance between the event and the point we are looking at
-						distancePoint=math.sqrt(pow(xy[point[0]][point[1]][0]-event.xdata,2)+pow(xy[point[0]][point[1]][1]-event.ydata,2))	#distance between the event and the closest pont we have found
-						#print(distanceEvent," vs ",distancePoint)
-						if(distancePoint>distanceEvent): 		#find the nearest
+				p = [utt[i][j], xy[i][j][0], xy[i][j][1]]
+				if not oneDotPerSpeaker or p in lPrototypes or p in lCriticisms:
+					if (xy[i][j][0]>=minX and xy[i][j][0]<=maxX and xy[i][j][1]>=minY and xy[i][j][1]<=maxY):	#near enough
+						if(point!=-1):		#if a point have been already found
+							#print(i," vs ",point)
+							distanceEvent=math.sqrt(pow(xy[i][j][0]-event.xdata,2)+pow(xy[i][j][1]-event.ydata,2))	#distance between the event and the point we are looking at
+							distancePoint=math.sqrt(pow(xy[point[0]][point[1]][0]-event.xdata,2)+pow(xy[point[0]][point[1]][1]-event.ydata,2))	#distance between the event and the closest pont we have found
+							#print(distanceEvent," vs ",distancePoint)
+							if(distancePoint>distanceEvent): 		#find the nearest
+								point=[i,j]
+						else:
 							point=[i,j]
-					else:
-						point=[i,j]
 		playSound(point,xy,utt)
 
 
@@ -396,6 +400,53 @@ def checkDir(path):
 		print("Directory :"+np+" does not exist")
 		return False
 
+
+
+def findSpkInUtt(spk):
+	'''
+	find a given speaker in the uttOrdered list
+	:param spk:
+	:return:
+	'''
+	for i in range(len( uttOrdered)):
+		if run.uttToSpk(uttOrdered[i][0])==spk:
+			return i
+
+def autoScaleFunction(proto,crit,size):
+	'''
+	scale the size of prototypes depending of the mean dist of the dot speaker with it
+	:param proto:
+	:param crit:
+	:param size:
+	:return:
+	'''
+	autoScale=[]
+	min = size*0.75
+	maxSize = size * 3
+	maxDist = 0
+	spk=[]
+
+	for i in range(len(proto)):
+		spkP = run.uttToSpk(proto[i][0])
+		z=findSpkInUtt(spkP)
+		d=0
+		for j in range(len(xyzOrdered[z])):
+			d=d+math.dist(proto[i][1:],xyzOrdered[z][j])
+		d=d/len(xyzOrdered[z])
+		if d>maxDist:
+			maxDist=d
+	for i in range(len(proto)):
+		spkP = run.uttToSpk(proto[i][0])
+		z=findSpkInUtt(spkP)
+		d=0
+		for j in range(len(xyzOrdered[z])):
+			d=d+math.dist(proto[i][1:],xyzOrdered[z][j])
+		d=d/len(xyzOrdered[z])
+		d2=(d*maxSize)/maxDist
+		#print(d,"  ",d2)
+		autoScale.append(d2)
+	return autoScale
+
 def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW=1,soundsdir="",detailSpeakerClick=True,title="Plot"):
 	'''
 	create a 2D plot
@@ -466,51 +517,6 @@ def create2DPlot(utt2D,xy,show=False,filePlotExport="plot.jpeg",dotS=20,dotLineW
 	if (show==True):
 		plot.show()
 
-def findSpkInUtt(spk):
-	'''
-	find a given speaker in the uttOrdered list
-	:param spk:
-	:return:
-	'''
-	for i in range(len( uttOrdered)):
-		if run.uttToSpk(uttOrdered[i][0])==spk:
-			return i
-
-def autoScaleFunction(proto,crit,size):
-	'''
-	scale the size of prototypes depending of the mean dist of the dot speaker with it
-	:param proto:
-	:param crit:
-	:param size:
-	:return:
-	'''
-	autoScale=[]
-	min = size*0.75
-	maxSize = size * 3
-	maxDist = 0
-	spk=[]
-
-	for i in range(len(proto)):
-		spkP = run.uttToSpk(proto[i][0])
-		z=findSpkInUtt(spkP)
-		d=0
-		for j in range(len(xyzOrdered[z])):
-			d=d+math.dist(proto[i][1:],xyzOrdered[z][j])
-		d=d/len(xyzOrdered[z])
-		if d>maxDist:
-			maxDist=d
-	for i in range(len(proto)):
-		spkP = run.uttToSpk(proto[i][0])
-		z=findSpkInUtt(spkP)
-		d=0
-		for j in range(len(xyzOrdered[z])):
-			d=d+math.dist(proto[i][1:],xyzOrdered[z][j])
-		d=d/len(xyzOrdered[z])
-		d2=(d*maxSize)/maxDist
-		#print(d,"  ",d2)
-		autoScale.append(d2)
-	return autoScale
-
 def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExport="plot.jpeg",dotS=20,protoS=25,dotLineW=1,protoLineW=1,soundsdir="",oneDotPerSpeaker=False,detailSpeakerClick=True,autoScaleDot=False,title="Plot"):
 	'''
 	create a 2D plot with prototypes and criticisms
@@ -567,7 +573,6 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 	#print(len(lPrototypes))
 	for i in lPrototypes:
 		#p=xyzOrdered[i[0]][i[1]]
-		#print(i)
 		xp.append(i[1])	# add the utt
 		yp.append(i[2])
 	xc=[]
@@ -598,7 +603,7 @@ def create2DPlotPrototypes(utt2D,xy,prototypes,criticisms,show=False,filePlotExp
 
 		#plt.clabel(ax,colors='blue')
 	if detailSpeakerClick:
-		cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick2DOpenNewPlot(event, ax, xy, utt))
+		cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick2DOpenNewPlot(event, ax, xy, utt,oneDotPerSpeaker))
 	else:
 		cid = fig.canvas.mpl_connect('button_press_event',lambda event: onclick2DPlaySound(event,ax,xy,utt))
 	plot.xlabel("X")

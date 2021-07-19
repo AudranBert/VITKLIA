@@ -15,7 +15,7 @@ mode: "reduction"
 # LDA or UMAP or LDA,UMAP
 reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: /files/SET4/xvectorsS4T3.txt
+xvectorsFile: /files/SET1/xvectorsS1.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
@@ -33,9 +33,9 @@ min_dist: 0.1
 # if true load the UMAP model
 loadUmapModel: true
 # saving the UMAP model
-saveUmapModelFile: "/SET4Reducted/umapModelS4"
+saveUmapModelFile: "/UMAPTest"
 # loading the UMAP model
-loadUmapModelFile: "/SET4Reducted/umapModelS4"
+loadUmapModelFile: "/UMAPTest"
 
 # LDA
 # if true load the LDA model
@@ -62,7 +62,7 @@ dotLineWidth: 0.25
 protoSize: 25
 # size of the edge of the prototype and the criticism (default=1) 
 protoLineWidth: 1.25
-oneDotPerSpeaker: false
+oneDotPerSpeaker: true
 detailSpeakerClick: true
 
 # prototypes
@@ -75,7 +75,7 @@ afterReduction: true
 # define the distance calculation
 kernel: euclidienne
 # if find proto is true, calculate the distance between prototypes and criticisms
-gridSearch: false
+gridSearch: true
 
 # no reduction  (mode=read)
 # reading proto and crit

@@ -10,10 +10,13 @@ import argparse
 import yaml
 import run
 from multiprocessing import Process
+import random
 
 from matplotlib import pyplot as plt
 from sklearn.mixture import GaussianMixture
 
+
+cp=[0.05,0.1,0.15,0.2,0.25,0.3,0.4,0.45,0.5,0.55,0.6,0.65,0.7,0.75,0.8,0.85,0.9,0.95,1]
 resources=""
 plotFile0=""
 plotFile1=""
@@ -42,7 +45,7 @@ def gmmSpk(list):
     return l
 
 def gmm(utt,vectors):
-    n_clusters=10
+    n_clusters=20
     gm = GaussianMixture(n_components=n_clusters, random_state=0).fit(vectors)
     l=gm.predict(vectors)
     lmean=[]
@@ -92,12 +95,22 @@ if __name__ == "__main__":
     #for i in range(len(utt)):
      #   print(utt[i]," :",l[i] ," : ",vectors[i])
     lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(lutt, lgmm, 1,False, "euclidienne",20,lgmmnb)
-    # fig, ax = plt.subplots()
-    # x = []
-    # y = []
-    # for i in lmean:
-    #     x.append(i[0])
-    #     y.append(i[1])
-    # ax.scatter(x, y)
-    # plt.show()
-    plotCreator.create2DPlotPrototypes(classifiedUtt, classifiedVectors,lprototypes,lcriticisms,True)
+    lp, lc, gridSearchIntra, gridSearchInter = prototypes.grouped(classifiedUtt, classifiedVectors, 1, False, "euclidienne",20)
+    fig, ax = plt.subplots()
+    x = []
+    y = []
+    colors=[]
+    for i in range(len(lprototypes)):
+        colors.append((random.choice(cp),random.choice(cp),random.choice(cp)))
+    for i in range(len(lprototypes)):
+        # x.append(i[1])
+        # y.append(i[2])
+        ax.scatter(lprototypes[i][1], lprototypes[i][2],color=colors[i],marker="D",edgecolors='black')
+    x = []
+    y = []
+    for i in range(len(lp)):
+        # x.append(i[1])
+        # y.append(i[2])
+        ax.scatter(lp[i][1], lp[i][2],color=colors[i],marker="^",edgecolors='black')
+    plt.show()
+    #plotCreator.create2DPlotPrototypes(classifiedUtt, classifiedVectors,lprototypes,lcriticisms,True)
