@@ -15,7 +15,8 @@ mode: "reduction"
 # LDA or UMAP or LDA,UMAP
 reductionMethod: UMAP
 # file where the embeddings are
-xvectorsFile: /files/SET1/xvectorsS1.txt
+# xvectorsFile: /files/SET1/xvectorsS1.txt
+xvectorsFile: /2speakersVectors.txt
 # "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
 variableSelectionOption: ""
 # if option set, define the number of variables selected
@@ -69,7 +70,7 @@ detailSpeakerClick: true
 # calculate prototypes and criticisms if true
 findProto: true
 eachSpeaker: true
-nbProto: 1
+nbProto: 2
 # if find proto is true, choose before or after UMAP
 afterReduction: true
 # define the distance calculation

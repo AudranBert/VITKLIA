@@ -33,6 +33,9 @@ def sum1MMD(z, m):
 				sum = sum + kernelTest(z[i], z[j])
 			else:
 				sum = sum + kernelEuclidienne(z[i], z[j])
+	# if ((1/(m*m))*sum==1):
+	# 	print("m*m=",m*m)
+	# 	print("sum=",sum)
 	return (1/(m*m))*sum
 
 def sum2MMD(z, x, m, n,gmmNb=None):
@@ -143,7 +146,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 	uttP=[]
 	uttC=[]
 	for ct in trange(nbPrototypesTot) :
-		# print(run.uttToSpk(newutt[ct][0]))
+		print(run.uttToSpk(newutt[ct][0]))
 		sum3 = sum3MMD(newvectors[ct], len(newvectors[ct]))
 		for j in range(nbPrototypes):
 
@@ -155,7 +158,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 					mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct]),gmm[ct]) + sum3
 				else:
 					mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
-					# print(mmd2,"=", sum1MMD(z, len(z)),"-",sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])),"+",sum3)
+					print(mmd2,"=", sum1MMD(z, len(z)),"-",sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])),"+",sum3)
 				z.pop()
 
 				MMD.append(mmd2)
@@ -167,7 +170,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				if ((max==-1 or MMD[max]<MMD[i]) and  (newvectors[ct][i] not in criti)):
 					max = i
 			if (min!=-1):
-				# print("MIN: ",MMD[min])
+				print("MIN: ",MMD[min])
 				proto.append(newvectors[ct][min])
 				uttP.append(newutt[ct][min])
 				grp.append([ct,min])
@@ -176,7 +179,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				z.append(newvectors[ct][min])
 
 			if(max!=-1):
-				# print("MAX: ",MMD[max])
+				print("MAX: ",MMD[max])
 				criti.append(newvectors[ct][max])
 				uttC.append(newutt[ct][max])
 				grc.append([ct,max])
@@ -184,6 +187,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				# 	criti[-1].append(i)
 			MMD.clear()
 			# print("------")
+		z.clear()
 	lproto=[]
 	lcrit=[]
 	for i in range(len(uttP)):
