@@ -92,8 +92,8 @@ if __name__ == "__main__":
     # for i in range(len(lgmm)):
     #     print("speaker:",classifiedUtt[i][0])
     #     print(lgmm[i][0])
-    #for i in range(len(utt)):
-     #   print(utt[i]," :",l[i] ," : ",vectors[i])
+    # for i in range(len(utt)):
+    #     print(utt[i]," :",l[i] ," : ",vectors[i])
     lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(lutt, lgmm, 1,False, "euclidienne",20,lgmmnb)
     lp, lc, gridSearchIntra, gridSearchInter = prototypes.grouped(classifiedUtt, classifiedVectors, 1, False, "euclidienne",20)
     fig, ax = plt.subplots()

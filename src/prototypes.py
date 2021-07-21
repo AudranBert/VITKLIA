@@ -83,6 +83,28 @@ def sum3MMD(x, n,gmmNb=None):
 				sum = sum + kernelEuclidienne(x[i], x[j])*a*b
 	return (1/(sizeTot))*sum
 
+def sum1Witness(point,x,n):
+	sum = 0
+	for i in range(n):
+		if kernelMode == "cosinus":
+			sum += kernel(point, x[i])
+		elif kernelMode == "test":
+			sum += kernelTest(point, x[i])
+		else:
+			sum += kernelEuclidienne(point, x[i])
+	return (1/n)*sum
+
+def sum2Witness(point,z,m):
+	sum = 0
+	for i in range(m):
+		if kernelMode == "cosinus":
+			sum += kernel(point, z[i])
+		elif kernelMode == "test":
+			sum += kernelTest(point, z[i])
+		else:
+			sum += kernelEuclidienne(point, z[i])
+	return (1/m)*sum
+
 def changePrototypesFormat(proto):
 	classifiedProto=[]
 	classifiedUtt=[]
@@ -153,22 +175,22 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 			#print("---------------------")
 			MMD=[]
 			for i in range(len(newvectors[ct])):
-				z.append(newvectors[ct][i])
-				if gmm!=None:
-					mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct]),gmm[ct]) + sum3
-				else:
-					mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
-					print(mmd2,"=", sum1MMD(z, len(z)),"-",sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])),"+",sum3)
-				z.pop()
+				mmd2=-1
+				if newvectors[ct][i] not in z:
+					z.append(newvectors[ct][i])
+					if gmm!=None:
+						mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct]),gmm[ct]) + sum3
+					else:
+						mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
+						# print(mmd2,"=", sum1MMD(z, len(z)),"-",sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])),"+",sum3)
+					z.pop()
 
 				MMD.append(mmd2)
 			min = -1
-			max = -1
+
 			for i in range (0,len(MMD)):
-				if ((min==-1 or MMD[min]>MMD[i])  and  (newvectors[ct][i] not in proto)):
+				if ((min==-1 or MMD[min]>MMD[i])  and  (newvectors[ct][i] not in proto)) and MMD[i]!=-1:
 					min = i
-				if ((max==-1 or MMD[max]<MMD[i]) and  (newvectors[ct][i] not in criti)):
-					max = i
 			if (min!=-1):
 				print("MIN: ",MMD[min])
 				proto.append(newvectors[ct][min])
@@ -177,17 +199,30 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				# for i in newvectors[ct][min]:
 				# 	proto[-1].append(i)
 				z.append(newvectors[ct][min])
-
-			if(max!=-1):
-				print("MAX: ",MMD[max])
-				criti.append(newvectors[ct][max])
-				uttC.append(newutt[ct][max])
-				grc.append([ct,max])
-				# for i in newvectors[ct][max]:
-				# 	criti[-1].append(i)
 			MMD.clear()
 			# print("------")
+		for j in range(nbPrototypes):
+			witness = []
+			max = -1
+			for i in range(len(newvectors[ct])):
+				wX = sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])) - sum2Witness(newvectors[ct][i], z, len(z))
+				print(newutt[ct][i],":",abs(wX),"=",wX,"=", sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])),"-",sum2Witness(newvectors[ct][i], z, len(z)))
+				wX=abs(wX)
+				witness.append(wX)
+			for i in range(len(witness)):
+				if ((max == -1 or witness[max] < witness[i]) and (newvectors[ct][i] not in criti)):
+					max = i
+			if (max != -1):
+				print("Tot:",len(newvectors[ct]))
+				print("MAX: ", witness[max])
+				print(z)
+				criti.append(newvectors[ct][max])
+				uttC.append(newutt[ct][max])
+				grc.append([ct, max])
+			witness.clear()
 		z.clear()
+	# for i in newvectors[ct][max]:
+	# 	criti[-1].append(i)
 	lproto=[]
 	lcrit=[]
 	for i in range(len(uttP)):
