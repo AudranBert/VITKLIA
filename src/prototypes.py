@@ -11,18 +11,42 @@ import numpy as np
 kernelMode="cosinus"
 
 def kernel(i,j):
+	'''
+	kernel cosinus function
+	:param i:
+	:param j:
+	:return:
+	'''
 	y = 1  # factor to determine ??
 	return np.dot(i,j)/(np.linalg.norm(i)*np.linalg.norm(j))
 
 def kernelTest(i,j):
+	'''
+	kernel test function: allows you to test whatever you want
+	:param i:
+	:param j:
+	:return:
+	'''
 	y = 1  # factor to determine ??
 	return math.exp(-1 * y *np.dot(i,j)/(np.linalg.norm(i)*np.linalg.norm(j)))
 
-def kernelEuclidienne(i,j):
+def kernelEuclidean(i,j):
+	'''
+	kernel euclidean function
+	:param i:
+	:param j:
+	:return:
+	'''
 	y = 1  # factor to determine ??
 	return math.exp(-1 * y * math.dist(i, j))
 
 def sum1MMD(z, m):
+	'''
+	the first sum of the MMD calculation
+	:param z:
+	:param m:
+	:return:
+	'''
 	sum=0
 	for i in range(0,m):
 		for j in range (0,m):
@@ -32,13 +56,22 @@ def sum1MMD(z, m):
 			elif kernelMode=="test":
 				sum = sum + kernelTest(z[i], z[j])
 			else:
-				sum = sum + kernelEuclidienne(z[i], z[j])
+				sum = sum + kernelEuclidean(z[i], z[j])
 	# if ((1/(m*m))*sum==1):
 	# 	print("m*m=",m*m)
 	# 	print("sum=",sum)
 	return (1/(m*m))*sum
 
 def sum2MMD(z, x, m, n,gmmNb=None):
+	'''
+	the second sum of the MMD calculation
+	:param z:
+	:param x:
+	:param m:
+	:param n:
+	:param gmmNb:
+	:return:
+	'''
 	sum=0
 	b = 1
 	a = 1
@@ -57,10 +90,17 @@ def sum2MMD(z, x, m, n,gmmNb=None):
 			elif kernelMode == "test":
 				sum = sum + kernelTest(z[i], x[j])*b
 			else:
-				sum = sum + kernelEuclidienne(z[i], x[j])*b
+				sum = sum + kernelEuclidean(z[i], x[j])*b
 	return (2/(sizeTot))*sum
 
 def sum3MMD(x, n,gmmNb=None):
+	'''
+	the third sum of the MMD calculation
+	:param x:
+	:param n:
+	:param gmmNb:
+	:return:
+	'''
 	sum=0
 	b=1
 	a=1
@@ -80,10 +120,17 @@ def sum3MMD(x, n,gmmNb=None):
 			elif kernelMode=="test":
 				sum = sum + kernelTest(x[i], x[j])*a*b
 			else:
-				sum = sum + kernelEuclidienne(x[i], x[j])*a*b
+				sum = sum + kernelEuclidean(x[i], x[j])*a*b
 	return (1/(sizeTot))*sum
 
 def sum1Witness(point,x,n):
+	'''
+	the first sum of the witness function
+	:param point:
+	:param x:
+	:param n:
+	:return:
+	'''
 	sum = 0
 	for i in range(n):
 		if kernelMode == "cosinus":
@@ -91,10 +138,17 @@ def sum1Witness(point,x,n):
 		elif kernelMode == "test":
 			sum += kernelTest(point, x[i])
 		else:
-			sum += kernelEuclidienne(point, x[i])
+			sum += kernelEuclidean(point, x[i])
 	return (1/n)*sum
 
 def sum2Witness(point,z,m):
+	'''
+	the second sum of the witness function
+	:param point:
+	:param z:
+	:param m:
+	:return:
+	'''
 	sum = 0
 	for i in range(m):
 		if kernelMode == "cosinus":
@@ -102,10 +156,14 @@ def sum2Witness(point,z,m):
 		elif kernelMode == "test":
 			sum += kernelTest(point, z[i])
 		else:
-			sum += kernelEuclidienne(point, z[i])
+			sum += kernelEuclidean(point, z[i])
 	return (1/m)*sum
 
 def changePrototypesFormat(proto):
+	'''
+	:param proto: a list of prototypes (utt id, dim1, dim2...)
+	:return: a list of utterances and of prototypes ordered by speakers and converted to vectors format (dim1, dim2...)
+	'''
 	classifiedProto=[]
 	classifiedUtt=[]
 	speakerList=[]
@@ -128,6 +186,18 @@ def changePrototypesFormat(proto):
 	return classifiedUtt,classifiedProto
 
 def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="euclidienne",groupSize=10,gmm=None,reducted=False):
+	'''
+	subdivide the vectors in multiples groups to compute faster
+	:param classifiedUtt: an list ordered by speaker of utterances
+	:param classifiedVectors: an list ordered by speaker of vectors
+	:param nbPrototypes: number of prototypes for each speaker
+	:param grid: activate grid search
+	:param kernelM: select the kernel function to use
+	:param groupSize: number of speakers in each group
+	:param gmm: is gmm have been used
+	:param reducted:
+	:return: a list of prototypes and criticisms
+	'''
 	sizeTot=len(classifiedVectors)
 	groupNb=sizeTot/groupSize
 	groupNb=math.ceil(groupNb)
@@ -154,6 +224,15 @@ def grouped(classifiedUtt,classifiedVectors,nbPrototypes=2,grid=True,kernelM="eu
 	return lProto,lCrit,g,g2
 
 def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne",gmm=None):
+	'''
+	:param newutt: an list ordered by speaker of utterances
+	:param newvectors: an list ordered by speaker of vectors
+	:param nbPrototypes: number of prototypes for each speaker
+	:param grid: activate grid search
+	:param kernelM:	select the kernel function to use
+	:param gmm:	is gmm have been used
+	:return: list of prototypes and criticisms
+	'''
 	global kernelMode
 	kernelMode=kernelM
 	print("Prototypes and criticisms...")
@@ -203,12 +282,12 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 			# print("------")
 		for j in range(nbPrototypes):
 			witness = []
-			max = -1
 			for i in range(len(newvectors[ct])):
 				wX = sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])) - sum2Witness(newvectors[ct][i], z, len(z))
 				print(newutt[ct][i],":",abs(wX),"=",wX,"=", sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])),"-",sum2Witness(newvectors[ct][i], z, len(z)))
 				wX=abs(wX)
 				witness.append(wX)
+			max = -1
 			for i in range(len(witness)):
 				if ((max == -1 or witness[max] < witness[i]) and (newvectors[ct][i] not in criti)):
 					max = i
@@ -241,6 +320,13 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 	return lproto,lcrit,g,g2
 
 def gridSearch(newutt,proto,crit):
+	'''
+	calculate the distance between each proto and their classes and between each classes
+	:param newutt:
+	:param proto:
+	:param crit:
+	:return:
+	'''
 	sum=0
 	for i in range(len(proto)):
 		sum+=math.dist(newutt[proto[i][0]][proto[i][1]],newutt[crit[i][0]][crit[i][1]])
@@ -260,6 +346,15 @@ def gridSearch(newutt,proto,crit):
 	return intra,inter
 
 def prototypes(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="euclidienne"):
+	'''
+	calculate prototypes for a given class
+	:param newutt:
+	:param newvectors:
+	:param nbPrototypes:
+	:param grid:
+	:param kernelM:
+	:return:
+	'''
 	global kernelMode
 	kernelMode=kernelM
 	print("Prototypes and criticisms...")
