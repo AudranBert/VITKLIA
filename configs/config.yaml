@@ -1,0 +1,106 @@
+# Config file for run.py
+
+# Every files and folder must don't have "/" at the start or the end (it will be add automatically)
+
+# Resources
+# folder where the program search files
+resources_dir: ".."
+# export_dir = resources_dir + export_dir
+export_dir: "files"
+# folder where the program search sounds 
+sounds_dir: "../sounds"
+
+# Mode
+# read or reduction
+# read take a file with reducted vectors
+# reduction take a file with embeddings
+mode: "reduction"
+
+# files names for reading and writing
+protoFile: "2SpeakersReducted/proto.txt"
+critFile: "2SpeakersReducted/crit.txt"
+uttFile: "2SpeakersReducted/utt.txt"
+
+# Read, no reduction  (mode=read)
+# reading proto and crit
+readingProto: true
+
+
+# Reduction properties (mode=reduction)
+# LDA or UMAP or LDA,UMAP
+reductionMethod: UMAP
+# file where the embeddings are
+xvectorsFile: "pretrained_models/2Speakers/2speakersVectors.txt"
+# number of dimension
+dimension: 2
+# save files or not (if mode==reduction)
+saveFiles: true
+
+# Selection of dimensions 
+# "" = all variables, "best" variables with biggest extend, "worst" variables with the lowest extend
+variableSelectionOption: ""   # default =""
+# if option set, define the number of variables selected
+variablesSelectionNumber: 20
+
+# UMAP
+# smaller = more local preservation (default: 15)
+n_neighbor: 15
+# min_dist (default 0.1)
+min_dist: 0.1
+# if true load the UMAP model
+loadUmapModel: true
+# saving the UMAP model
+saveUmapModelFile: "2SpeakersReducted/UMAP2spk"
+# loading the UMAP model
+loadUmapModelFile: "2SpeakersReducted/UMAP2spk"
+
+# LDA
+# if true load the LDA model
+loadLdaModel: true
+# saving the LDA model
+saveLdaModelFile: "ldaModel"
+# loading the LDA model
+loadLdaModelFile: "ldaModel"
+
+
+
+# Plot properties
+# file to save the plot
+plotFile: "plot/test.jpg"
+# Activate the plot autonaming
+autoNamePlot: false
+# showing the plot or not
+showPlot: true
+# size of the dot (default=15) 
+dotSize: 10
+# size of the edge of the dot (default=0.5) 
+dotLineWidth: 0.25
+# size of the prototype and the criticism (default=20) 
+protoSize: 25
+# size of the edge of the prototype and the criticism (default=1) 
+protoLineWidth: 1.25
+# if true show only prototypes
+oneDotPerSpeaker: false
+# if true when you click on an utterance it opens a new plot with only the speaker of the utt
+detailSpeakerClick: true
+
+# Prototypes
+# calculate prototypes and criticisms if true
+findProto: true
+# calculate prototypes for each speaker or for the whole utterances
+eachSpeaker: true
+# defines the number of prototypes for each speakers or for the whole utterances
+nbProto: 2
+# if find proto is true, choose before or after UMAP
+afterReduction: true
+# define the distance calculation
+kernel: "euclidienne"
+# if find proto is true, calculate the distance between prototypes and criticisms
+gridSearch: true
+
+
+# Optimisation
+# calculate prototypes by dividing speakers in small groups
+groupCalculation: false
+# number of speaker in a group for calculating prototypes and criticisms
+groupSize: 20

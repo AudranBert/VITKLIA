@@ -47,6 +47,15 @@ def load(file):
 
     return utt, vectors
 
+def checkPath(path,make=False):
+    if not(os.path.exists(path)):
+        return True
+    else:
+        if make:
+            os.makedirs(path)
+            return True
+        else:
+            return False
 
 def errorExit(msg, code=-1):
     '''
@@ -226,7 +235,14 @@ def readConf(fileName):
     for i in f:
         d += i + "/"
     if not (os.path.isdir(d)):
-        os.mkdir(d)
+        os.makedirs(d)
+    f=saveUttFile.split("/")
+    f.pop()
+    d= ""
+    for i in f:
+        d+= i + "/"
+    if not (os.path.isdir(d)):
+        os.makedirs(d)
     return yaml_content
 
 
@@ -301,7 +317,7 @@ if __name__ == "__main__":
             if (yaml_content.get("afterReduction")):
 
                 if yaml_content.get("eachSpeaker"):
-                    if yaml_content.get("reducedUtterances"):
+                    if yaml_content.get("groupCalculation"):
                         lprototypes, lcriticisms, gridSearchIntra, gridSearchInter = prototypes.grouped(
                         classifiedUtt, classifiedVectors,yaml_content.get("nbProto"), yaml_content.get("gridSearch"), yaml_content.get("kernel"),yaml_content.get("groupSize"))
                     else:

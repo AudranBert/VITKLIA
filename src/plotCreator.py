@@ -382,7 +382,7 @@ def checkDir(path):
 	:param path:
 	:return:
 	'''
-	p = path.split("/")
+	p = path.split(os.path.sep)
 	p.pop()
 	np = ""
 	for i in p:

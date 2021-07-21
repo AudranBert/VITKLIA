@@ -1,7 +1,3 @@
 __pycache__/
-resources/plot/
-resources/dataset/Out
-resources/files/SET1
-resources/files/SET1Reducted
-resources/files/SET4
-resources/files/SET4Reducted
+configs/plot/
+

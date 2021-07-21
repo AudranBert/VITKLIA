@@ -249,28 +249,27 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 	for ct in trange(nbPrototypesTot) :
 		print(run.uttToSpk(newutt[ct][0]))
 		sum3 = sum3MMD(newvectors[ct], len(newvectors[ct]))
-		for j in range(nbPrototypes):
+		for j in range(nbPrototypes):	# select the prototypes
 
 			#print("---------------------")
 			MMD=[]
-			for i in range(len(newvectors[ct])):
+			for i in range(len(newvectors[ct])):	# for each point
 				mmd2=-1
 				if newvectors[ct][i] not in z:
-					z.append(newvectors[ct][i])
+					z.append(newvectors[ct][i])		# add the point to the list of prototypes
+					# calculate the mmd
 					if gmm!=None:
 						mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct]),gmm[ct]) + sum3
 					else:
 						mmd2 = sum1MMD(z, len(z)) - sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])) + sum3
 						# print(mmd2,"=", sum1MMD(z, len(z)),"-",sum2MMD(z, newvectors[ct], len(z), len(newvectors[ct])),"+",sum3)
-					z.pop()
-
-				MMD.append(mmd2)
+					z.pop()		# remove the point from the list of prototypes
+				MMD.append(mmd2)	# add the score to the list
 			min = -1
-
-			for i in range (0,len(MMD)):
+			for i in range (0,len(MMD)):	# search the min from the score list
 				if ((min==-1 or MMD[min]>MMD[i])  and  (newvectors[ct][i] not in proto)) and MMD[i]!=-1:
 					min = i
-			if (min!=-1):
+			if (min!=-1):	# add the prototype to the list
 				print("MIN: ",MMD[min])
 				proto.append(newvectors[ct][min])
 				uttP.append(newutt[ct][min])
@@ -280,18 +279,19 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				z.append(newvectors[ct][min])
 			MMD.clear()
 			# print("------")
-		for j in range(nbPrototypes):
+		for j in range(nbPrototypes):	# select the criticisms
 			witness = []
-			for i in range(len(newvectors[ct])):
+			for i in range(len(newvectors[ct])):	# calculate the witness value for each point
+				# witness function
 				wX = sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])) - sum2Witness(newvectors[ct][i], z, len(z))
 				print(newutt[ct][i],":",abs(wX),"=",wX,"=", sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])),"-",sum2Witness(newvectors[ct][i], z, len(z)))
 				wX=abs(wX)
 				witness.append(wX)
 			max = -1
-			for i in range(len(witness)):
-				if ((max == -1 or witness[max] < witness[i]) and (newvectors[ct][i] not in criti)):
+			for i in range(len(witness)):	# for each witness value
+				if ((max == -1 or witness[max] < witness[i]) and (newvectors[ct][i] not in criti)):		# if witness value > max
 					max = i
-			if (max != -1):
+			if (max != -1):		# add the max to the crit list
 				print("Tot:",len(newvectors[ct]))
 				print("MAX: ", witness[max])
 				print(z)
@@ -304,7 +304,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 	# 	criti[-1].append(i)
 	lproto=[]
 	lcrit=[]
-	for i in range(len(uttP)):
+	for i in range(len(uttP)):	# make the prototypes and criticisms list
 		lproto.append([])
 		lproto[-1].append(uttP[i])
 		for j in proto[i]:

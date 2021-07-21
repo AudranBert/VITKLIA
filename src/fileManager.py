@@ -1,4 +1,6 @@
 import random
+import run
+import re
 import os
 import prototypes
 from pathlib import Path
@@ -15,6 +17,7 @@ def readUtt(vectorFile):
 	'''
 	utt = []
 	vectors = []
+
 	file = open(vectorFile, "r")
 	for line in file:
 		line=line.strip("\n")
