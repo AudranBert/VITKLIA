@@ -72,6 +72,7 @@ def gmm(utt,vectors):
 if __name__ == "__main__":
     '''
     main
+    not working properly
     '''
     utt,vectors=fileManager.readUtt("../resources/files/utt.txt")
     v2=vectors[:]

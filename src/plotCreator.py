@@ -39,11 +39,24 @@ cp = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3, 0.4, 0.45, 0.5, 0.55, 0.6, 0.65, 0.7, 0.7
 
 
 def callback(in_data, frame_count, time_info, status):
+	'''
+	callback for the audio
+	:param in_data:
+	:param frame_count:
+	:param time_info:
+	:param status:
+	:return:
+	'''
 	data = wf.readframes(frame_count)
 	return (data, pyaudio.paContinue)
 
 
 def pyAudioStarting(file):
+	'''
+	start a sound if it exists
+	:param file:
+	:return:
+	'''
 	global stream
 	global wf
 	global paudio
@@ -61,6 +74,14 @@ def pyAudioStarting(file):
 
 
 def setOptions(dotS=20, dotLineW=1, protoS=-1, protoLineW=-1):
+	'''
+	set global params for plots
+	:param dotS:
+	:param dotLineW:
+	:param protoS:
+	:param protoLineW:
+	:return:
+	'''
 	global dotSize
 	global protoSize
 	global dotLineWidth
@@ -72,13 +93,18 @@ def setOptions(dotS=20, dotLineW=1, protoS=-1, protoLineW=-1):
 
 
 def setSound(dir):
+	'''
+	set sound path
+	:param dir:
+	:return:
+	'''
 	global sounds_dir
 	sounds_dir = dir
 
 
 def playSound(i, xy, utt):
 	'''
-	play a sound depending of the id
+	play a sound depending of the utt id
 	:param i:
 	:param xy:
 	:param utt:
@@ -88,7 +114,7 @@ def playSound(i, xy, utt):
 	global wf
 	if (i is not None and i != -1):  # if a point have been found
 		# print(i)
-		spk = utt[i[0]][i[1]].split("-")
+		#spk = utt[i[0]][i[1]].split("-")
 
 		if stream is not None:
 			# stop stream
@@ -110,7 +136,7 @@ def playSound(i, xy, utt):
 
 def rePlot(spk):
 	'''
-	plot only one speaker
+	plot only one speaker when clicking on a point
 	:param spk:
 	:return:
 	'''
@@ -168,18 +194,8 @@ def rePlot(spk):
 				plt.legend()
 		title = "Speaker :" + str(spk)
 		cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick2D(event, ax, xyz, utt))
-
 		plt.title(title)
 		plt.show()
-		# on the plot
-		# plot.clf()
-		# fig=plot.gcf()
-		# ax=fig.add_subplot()
-		# ax.scatter(xy[id][0], xy[id][1])
-		# title="Speaker :"+str(spk)
-		# plot.title(title)
-		# fig.canvas.draw_idle()
-		# plot.show()
 
 
 def find3DCoords(event, ax):
@@ -202,7 +218,7 @@ def find3DCoords(event, ax):
 
 def onclick2D(event, ax, xy, utt, oneDotPerSpeaker=False,newPlot=False):  # click on the plot
 	'''
-	when click on a dot play the corresponding sound
+	when click on a dot play the corresponding sound or make a new plot
 	:param event:
 	:param ax:
 	:param xy:
@@ -244,7 +260,7 @@ def onclick2D(event, ax, xy, utt, oneDotPerSpeaker=False,newPlot=False):  # clic
 
 def onclick3D(event, ax, xyz, utt, oneDotPerSpeaker=False,newPlot=False):  # click on the plot
 	'''
-	when click on 3D plot play the corresponding sound
+	when click on 3D plot play the corresponding sound or make a new plot
 	:param event:
 	:param ax:
 	:param xyz:
@@ -288,61 +304,15 @@ def onclick3D(event, ax, xyz, utt, oneDotPerSpeaker=False,newPlot=False):  # cli
 
 def chooseColor(xy, utt):
 	'''
-	choose a color for each speaker and order it by speaker
-	:param xy:
-	:param utt:
-	:return:
-	'''
-	colors = []
-	loc = []
-	newXY = []
-	ctutt = 0
-	for i in utt:
-		idL = i.split("-", 1)
-		id = idL[0]
-		ct = 0
-		find = False
-		for j in loc:
-			if j == id:
-				# colors.append(colors[ct])
-				newXY[ct].append(xy[ctutt])
-				find = True
-				break
-			ct += 1
-		if find == False:
-			loc.append(id)
-			# if (rgb+1>=255):
-			# 	rgb=0
-			rgb = (random.choice(cp), random.choice(cp), random.choice(cp))
-			colors.append(rgb)
-			newXY.append([])
-			newXY[-1].append(xy[ctutt])
-			# print(id, " not found :", rgb)
-		# print(id)
-		ctutt += 1
-	# for i in newutt:
-	#	print(i)
-	print("Number of speakers:", len(colors))
-	return colors, newXY, loc
-
-
-def chooseColor2(xy, utt):
-	'''
 	choose a color for each speaker
 	:param xy:
 	:param utt:
 	:return:
 	'''
 	colors = []
-	loc = []
-	newXY = []
-	ctutt = 0
 	for i in range(len(utt)):
 		rgb = (random.uniform(0.05, 1), random.uniform(0.05, 1), random.uniform(0.05, 1))
 		colors.append(rgb)
-
-	# for i in newutt:
-	#	print(i)
 	print("Number of speakers:", len(colors))
 	return colors, xy, utt
 
@@ -376,24 +346,6 @@ def chooseColorProto(utt, xy, colors, proto, crit):
 	return colorsProto, colorsCrit
 
 
-def checkDir(path):
-	'''
-	check if a directory exist or not
-	:param path:
-	:return:
-	'''
-	p = path.split(os.path.sep)
-	p.pop()
-	np = ""
-	for i in p:
-		np += i + os.path.sep
-	if (os.path.isdir(np)):
-		return True
-	else:
-		print("Directory :" + np + " does not exist")
-		return False
-
-
 def findSpkInUtt(spk):
 	'''
 	find a given speaker in the uttOrdered list
@@ -407,7 +359,7 @@ def findSpkInUtt(spk):
 
 def autoScaleFunction(proto, crit, size):
 	'''
-	scale the size of prototypes depending of the mean dist of the dot speaker with it
+	scale the size of prototypes depending of the mean dist between the prototypes and the others points of the speaker
 	:param proto:
 	:param crit:
 	:param size:
@@ -417,8 +369,6 @@ def autoScaleFunction(proto, crit, size):
 	min = size * 0.75
 	maxSize = size * 3
 	maxDist = 0
-	spk = []
-
 	for i in range(len(proto)):
 		spkP = run.uttToSpk(proto[i][0])
 		z = findSpkInUtt(spkP)
@@ -469,7 +419,7 @@ def create2DPlot(utt2D, xy, show=False, filePlotExport="plot.jpeg", dotS=20, dot
 	setOptions(dotS, dotLineW)
 	plot = plt
 	fig, ax = plot.subplots()
-	colorsOrdered, xyzOrdered, uttOrdered = chooseColor2(xy, utt)
+	colorsOrdered, xyzOrdered, uttOrdered = chooseColor(xy, utt)
 	x = []
 	y = []
 	for i in xyzOrdered:  # for each speaker
@@ -478,24 +428,9 @@ def create2DPlot(utt2D, xy, show=False, filePlotExport="plot.jpeg", dotS=20, dot
 		for j in i:
 			x[len(x) - 1].append(j[0])  # add the utt
 			y[len(y) - 1].append(j[1])
-	# x = [i[0] for i in newutt]
-	# y = [i[1] for i in newutt]
-	# colormap = np.array(['r', 'g', 'b'])
-	# for i in range(0,len(colors)):
-	#
-	# 	### place the points
-	# 	ax.scatter(x[i], y[i], c=[colors[i]])
-	# 	# ax.scatter(x, y2, c = 'blue')
 	for i in range(0, len(xyzOrdered)):
-		# print()
-		# print(colors[i])
-		# print(x[i])
-		# print(y[i])
-		# print("")
 		# ax.scatter(x[i],y[i])
 		ax.scatter(x[i], y[i], s=dotSize, color=colorsOrdered[i], edgecolors='black', linewidth=dotLineWidth)
-	# ax.scatter(x, y,  c=colormap[colors])
-	# 	###
 	# bind press event with onclick function
 	cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick2D(event, ax, xy, utt,False,detailSpeakerClick))
 	# plot labelling
@@ -503,7 +438,7 @@ def create2DPlot(utt2D, xy, show=False, filePlotExport="plot.jpeg", dotS=20, dot
 	plot.ylabel("Y")
 	plot.legend(loc='upper left')
 	plot.title(title)
-	if checkDir(filePlotExport):
+	if run.checkPath(filePlotExport):
 		plot.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show == True):
@@ -546,7 +481,7 @@ def create2DPlotPrototypes(utt2D, xy, prototypes, criticisms, show=False, filePl
 	plot = plt
 	# plot.ion()
 	fig, ax = plot.subplots()
-	colorsOrdered, xyzOrdered, uttOrdered = chooseColor2(xy, utt2D)
+	colorsOrdered, xyzOrdered, uttOrdered = chooseColor(xy, utt2D)
 	colorsProto, colorsCrit = chooseColorProto(uttOrdered, xyzOrdered, colorsOrdered, prototypes, criticisms)
 	lPrototypes = prototypes
 	lCriticisms = criticisms
@@ -578,12 +513,6 @@ def create2DPlotPrototypes(utt2D, xy, prototypes, criticisms, show=False, filePl
 		xc.append(i[1])  # add the utt
 		yc.append(i[2])
 	autoScale = []
-	# if colorsProto==None or len(colorsProto)==0:
-	# 	rgb = (random.choice(cp), random.choice(cp), random.choice(cp))
-	# 	for i in range(len(xp)):
-	# 		colorsProto.append(rgb)
-	# 	for i in range(len(xc)):
-	# 		colorsCrit.append(rgb)
 	if autoScaleDot:
 		autoScale = autoScaleFunction(lPrototypes, lCriticisms, protoSize)
 	for i in range(len(xc)):
@@ -605,8 +534,7 @@ def create2DPlotPrototypes(utt2D, xy, prototypes, criticisms, show=False, filePl
 	plot.ylabel("Y")
 	# plot.legend(loc='upper left')
 	plot.title(title)
-
-	if checkDir(filePlotExport):
+	if run.checkPath(filePlotExport):
 		plot.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	# plot.ioff()
@@ -645,8 +573,9 @@ def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, fil
 	xyz = xyz3D
 	utt = utt3D
 	setSound(soundsdir)
+	setOptions(dotS, dotLineW)
 	fig = plt.figure()
-	colorsOrdered, xyzOrdered, uttOrdered = chooseColor2(xyz3D, utt3D)
+	colorsOrdered, xyzOrdered, uttOrdered = chooseColor(xyz3D, utt3D)
 	colorsProto, colorsCrit = chooseColorProto(uttOrdered, xyzOrdered, colorsOrdered, prototypes, criticisms)
 	lPrototypes = prototypes
 	lCriticisms = criticisms
@@ -696,7 +625,7 @@ def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, fil
 	ax.set_zlabel("Z")
 	# plt.legend(loc='upper left')
 	plt.title("PLOT")
-	if checkDir(filePlotExport):
+	if run.checkPath(filePlotExport):
 		plt.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show == True):
@@ -716,8 +645,9 @@ def create3DPlot(utt, xyz, show=False, filePlotExport="plot.jpeg", dotSize=20, s
 	:return:
 	'''
 	setSound(soundsdir)
+	setOptions(dotS, dotLineW)
 	fig = plt.figure()
-	colorsOrdered, xyzOrdered, uttOrdered = chooseColor2(xyz3D, utt3D)
+	colorsOrdered, xyzOrdered, uttOrdered = chooseColor(xyz3D, utt3D)
 	x = []
 	y = []
 	z = []
@@ -730,30 +660,18 @@ def create3DPlot(utt, xyz, show=False, filePlotExport="plot.jpeg", dotSize=20, s
 			y[len(y) - 1].append(j[1])
 			z[len(z) - 1].append(j[1])
 	ax = fig.add_subplot(projection='3d')
-	# x = [i[0] for i in xyz]
-	# y = [i[1] for i in xyz]
-	# z = [i[2] for i in xyz]
 	### place the points
 	for i in range(0, len(newutt)):
-		# print()
-		# print(colors[i])
-		# print(x[i])
-		# print(y[i])
-		# print("")
-		# ax.scatter(x[i],y[i])
 		ax.scatter(x[i], y[i], z[i], s=dotSize, color=colorsOrdered[i])
-	# ax.scatter(x, y,z ,c='red')
-	# ax.scatter(x, y2, c = 'blue')
-	###
 	# bind press event with onclick function
-	cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick3D(event, ax, xyz, utt))
+	cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick3D(event, ax, xyz, utt,detailSpeakerClick))
 	# plot labelling
 	ax.set_xlabel("X")
 	ax.set_ylabel("Y")
 	ax.set_zlabel("Z")
 	# plt.legend(loc='upper left')
 	plt.title("PLOT")
-	if checkDir(filePlotExport):
+	if run.checkPath(filePlotExport):
 		plt.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show == True):

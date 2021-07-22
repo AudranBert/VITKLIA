@@ -72,7 +72,7 @@ def ldaMethod(utt,vectors,mode,dimension,load=False,saveModel="",loadModel=""):
 
 def umapMethod(vectors,dimension,n_neighbor,min_dist,load,saveModel,loadModel):
     '''
-    use UMAP to reduce
+    use UMAP to reduce the dimensions of the vectors
     :param vectors:
     :param dimension:
     :param n_neighbor:

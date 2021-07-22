@@ -20,6 +20,8 @@ mode: "reduction"
 protoFile: "2SpeakersReducted/proto.txt"
 critFile: "2SpeakersReducted/crit.txt"
 uttFile: "2SpeakersReducted/utt.txt"
+# for autonaming files by using the xvectorsFile
+autoName: false
 
 # Read, no reduction  (mode=read)
 # reading proto and crit
@@ -66,7 +68,7 @@ loadLdaModelFile: "ldaModel"
 
 # Plot properties
 # file to save the plot
-plotFile: "plot/test.jpg"
+plotFile: "plot/2Speakers.jpg"
 # Activate the plot autonaming
 autoNamePlot: false
 # showing the plot or not

@@ -105,6 +105,13 @@ def exportFiles(utt,vectors,proto,crit,vectorFile,protoFile,critFile):
 	print("export")
 
 def exportUtt(utt,vectors,vectorFile):
+	'''
+	export vectors with their utt id in file
+	:param utt:
+	:param vectors:
+	:param vectorFile:
+	:return: nothing
+	'''
 	file=open(vectorFile,"w")
 	for i in range (len(vectors)):
 		for j in range(len(vectors[i])):
@@ -116,10 +123,9 @@ def exportUtt(utt,vectors,vectorFile):
 			file.write(line)
 	file.close()
 
-
 def exportData(utt,data, file):
 	'''
-	save utt and vectors
+	export utt and vectors for numpy array
 	:param utt:
 	:param data:
 	:param file:

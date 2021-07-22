@@ -1,3 +1,5 @@
+import re
+
 import plotCreator
 import xvectorsParser
 import fileManager
@@ -48,6 +50,12 @@ def load(file):
     return utt, vectors
 
 def checkPath(path,make=False):
+    '''
+    check if a path exist and if make=True create it
+    :param path:
+    :param make:
+    :return:
+    '''
     if not(os.path.exists(path)):
         return True
     else:
@@ -55,6 +63,7 @@ def checkPath(path,make=False):
             os.makedirs(path)
             return True
         else:
+            print("Path :" + path + " does not exist")
             return False
 
 def errorExit(msg, code=-1):
@@ -66,6 +75,28 @@ def errorExit(msg, code=-1):
     '''
     print(msg)
     exit(code)
+
+def convertProto(utt,vec,l):
+    '''
+    find the item in l in utt to update the vectors in l
+    usefull when the number of dimension of vec has changed
+    :param utt:
+    :param vec:
+    :param l:
+    :return:
+    '''
+    newL=[]
+    for i in l:
+        for j in range(len(utt)):
+            if i[0] in utt[j]:
+                a = utt[j].index(i[0])
+                #print(vec[j][a])
+                newL.append([])
+                newL[-1].append(i[0])
+                for z in vec[j][a]:
+                    newL[-1].append(z)
+                break
+    return newL
 
 
 def autoName(plotFile, dimension, reductionMethod, intra, inter):
@@ -147,25 +178,13 @@ def uttToSpk(id):
     spk=id.split("-")
     return spk[0]
 
-def convertProto(utt,vec,l):
-    newL=[]
-    for i in l:
-        for j in range(len(utt)):
-            if i[0] in utt[j]:
-                a = utt[j].index(i[0])
-                #print(vec[j][a])
-                newL.append([])
-                newL[-1].append(i[0])
-                for z in vec[j][a]:
-                    newL[-1].append(z)
-                break
-    return newL
 
 def readConf(fileName):
     '''
-    read the configuration file and return file names
-    :param fileName:
-    :return:
+    read the configuration file and return the conf object
+    construct paths of files
+    :param fileName: config file path
+    :return: yaml object
     '''
     global resources
     global sounds
@@ -203,28 +222,42 @@ def readConf(fileName):
     resources = yaml_content.get("resources_dir")
     exportDir = yaml_content.get("export_dir")
     if not (os.path.isdir(resources + os.path.sep + exportDir)):
-        os.mkdir(resources + os.path.sep + exportDir)
-    saveUmapModelFile = yaml_content.get("saveUmapModelFile")
-    if saveUmapModelFile != "":
-        saveUmapModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("saveUmapModelFile")
-    loadUmapModelFile = yaml_content.get("loadUmapModelFile")
-    if loadUmapModelFile != "":
-        loadUmapModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("loadUmapModelFile")
-    saveLdaModelFile = yaml_content.get("saveLdaModelFile")
-    if saveLdaModelFile != "":
-        saveLdaModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("saveLdaModelFile")
-    loadLdaModelFile = yaml_content.get("loadLdaModelFile")
-    if loadLdaModelFile != "":
-        loadLdaModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("loadLdaModelFile")
-    saveProtoFile = yaml_content.get("protoFile")
-    if saveProtoFile != "":
-        saveProtoFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("protoFile")
-    saveCritFile = yaml_content.get("critFile")
-    if saveCritFile != "":
-        saveCritFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("critFile")
-    saveUttFile = yaml_content.get("uttFile")
-    if saveUttFile != "":
-        saveUttFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("uttFile")
+        os.makedirs(resources + os.path.sep + exportDir)
+    if yaml_content.get("autoName"):
+        n=xvectorsFile.split(".")
+        if len(n)>1:
+            n.pop()
+        n=n[-1].split("/")
+        n=n[-1]
+        saveUmapModelFile = resources + os.path.sep + exportDir + os.path.sep + n + "UMAP"
+        loadUmapModelFile = resources + os.path.sep + exportDir + os.path.sep + n + "UMAP"
+        saveLdaModelFile = resources + os.path.sep + exportDir + os.path.sep + n + "LDA"
+        loadLdaModelFile = resources + os.path.sep + exportDir + os.path.sep + n + "LDA"
+        saveProtoFile = resources + os.path.sep + exportDir + os.path.sep + n + "proto.txt"
+        saveCritFile = resources + os.path.sep + exportDir + os.path.sep + n + "crit.txt"
+        saveUttFile = resources + os.path.sep + exportDir + "/" + n + "utt.txt"
+    else:
+        saveUmapModelFile = yaml_content.get("saveUmapModelFile")
+        if saveUmapModelFile != "":
+            saveUmapModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("saveUmapModelFile")
+        loadUmapModelFile = yaml_content.get("loadUmapModelFile")
+        if loadUmapModelFile != "":
+            loadUmapModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("loadUmapModelFile")
+        saveLdaModelFile = yaml_content.get("saveLdaModelFile")
+        if saveLdaModelFile != "":
+            saveLdaModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("saveLdaModelFile")
+        loadLdaModelFile = yaml_content.get("loadLdaModelFile")
+        if loadLdaModelFile != "":
+            loadLdaModelFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("loadLdaModelFile")
+        saveProtoFile = yaml_content.get("protoFile")
+        if saveProtoFile != "":
+            saveProtoFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("protoFile")
+        saveCritFile = yaml_content.get("critFile")
+        if saveCritFile != "":
+            saveCritFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("critFile")
+        saveUttFile = yaml_content.get("uttFile")
+        if saveUttFile != "":
+            saveUttFile = resources + os.path.sep + exportDir + os.path.sep + yaml_content.get("uttFile")
     xvectorsFile = resources + os.path.sep + xvectorsFile
     #exportReductionFile = resources + os.path.sep + exportReductionFile
     #readingFile = resources + os.path.sep + readingFile

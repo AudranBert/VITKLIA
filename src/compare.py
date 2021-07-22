@@ -24,7 +24,7 @@ sounds=""
 
 def readConf(fileName):
     '''
-    read the configuration file and return file names
+    read the configuration file and yaml_content
     :param fileName:
     :return:
     '''
@@ -59,6 +59,14 @@ def readConf(fileName):
     return yaml_content
 
 def compare(data1,data2,title="Titre",showPrint=False):
+    '''
+    compare two list of data
+    :param data1:
+    :param data2:
+    :param title:
+    :param showPrint:
+    :return: the mean dist between the two list and a title
+    '''
     sum = 0
     pos = []
     dist = []
@@ -88,6 +96,15 @@ def compare(data1,data2,title="Titre",showPrint=False):
     return mean,title
 
 def calcul(proto,crit,showPrint=False,mode=[["p-0","p-1"],["c-0","p-0"],["c-1","p-1"],["c-0","p-1"],["c-1","p-0"]],):
+    '''
+    compare each mode
+    p-0 p-1 means prototypes set 0 with prototypes set 1
+    :param proto:
+    :param crit:
+    :param showPrint:
+    :param mode:
+    :return:
+    '''
     title=[]
     mean=[]
     for i in mode:
