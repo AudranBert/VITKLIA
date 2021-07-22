@@ -6,6 +6,11 @@ import sys
 
 
 if __name__ == "__main__":
+    '''
+    main
+    create a utt2spk and spk2utt depending of a feats.scp file
+    '''
+
     # args
     newspkfile = "out.txt"
     newuttfile = "utt"
@@ -25,23 +30,13 @@ if __name__ == "__main__":
     if (len(sys.argv) >= 4):
         featfile = sys.argv[3]  # new feats.scp file
 
-    # if (len(sys.argv) >= 8):
-    #    numerotaion = sys.argv[7]
-    ## numerotation
-    # if (numerotaion):
-    #     ct=1
-    #     n=newFeat.split(".")
-    #     if(os.path.isfile(newFeat)):
-    #         while(os.path.isfile(n[0]+str(ct)+"."+n[1])):
-    #             ct+=1
-    #         newFeat=n[0]+str(ct)+"."+n[1]
-
 
     print("feat: ", featfile)
     print(newspkfile)
     print(newuttfile)
     listSpeaker=[]
     listUtt=[]
+
     if os.path.isfile(featfile):  # check if files exist
         feat = open(featfile, "r")
         newutt=open(newuttfile, "w")

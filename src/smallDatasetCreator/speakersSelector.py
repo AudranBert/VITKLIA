@@ -9,73 +9,17 @@ oldutt = ""
 oldspk = ""
 
 
-def testDataset(newspk, newFeat, newutt, oldfeat, oldspk):
-    if (os.path.isfile(newspk) and os.path.isfile(oldfeat)):  # check if files exist
-        print(oldfeat)
-        print(newFeat)
-        print(newutt)
-        print("FILES FOUND")
-        print(newspk)
-        rm = open(oldspk, "r")
-        rmFromSpk = []
-        for i in rm:
-            s = i.strip("\n")
-            s = s.split()
-            ct = 0
-            rmFromSpk.append(s[0])
-        rm.close()
-        out = open(newspk, "r")
-
-        lines = out.readlines()
-        idSpeaker = []
-        linesSpk = []
-        for i in lines:  # for each speaker
-            s = i.strip("\n")
-            s = s.split()
-            # print(s[0])
-            if s[0] not in rmFromSpk:
-                idSpeaker.append(s[0])
-                linesSpk.append(i)
-        out.close()
-        spk = open(newspk, "w")
-        for i in linesSpk:  # for each speaker
-            spk.write(i)
-        spk.close()
-        feats = open(newFeat, "r")
-        # result = open(newFeat, "w")
-        data = []
-
-        ct = 0
-        for line in feats:  # for each lines of feats
-            s = line.strip("\n")
-            s = s.split()
-            found = False
-            for i in idSpeaker:
-                r = re.match(i + "-", s[0])
-                if (r):  # speaker found
-                    data.append([s[0], s[1], i])
-                    print(s[0])
-                # result.write(s[0] + " " + s[1] + "\n")
-                # newspkFile.write(s[0] + " " + i + "\n")
-            ct += 1
-            if (ct % 10000 == 0):
-                print("Lines ", ct, " verified...")
-        # for i in idSpeaker:
-        #    result.write(i+"\n")
-        feats.close
-        result = open(newFeat, "w")
-        newspkFile = open(newutt, "w")
-        for i in data:
-            result.write(i[0] + " " + i[1] + "\n")
-            newspkFile.write(i[0] + " " + i[2] + "\n")
-        feats.close()
-        result.close()
-        newspkFile.close()
-    else:
-        print("NO FILE")
-
 
 def trainDataset(newspk, newFeat, newutt, feat, test="False"):
+    '''
+    create feats.scp and utt2spk depending of a spk2utt file
+    :param newspk:
+    :param newFeat:
+    :param newutt:
+    :param feat:
+    :param test:
+    :return:
+    '''
     if (os.path.isfile(newspk) and os.path.isfile(feat)):  # check if files exist
         print("FILES FOUND")
         out = open(newspk, "r")
@@ -184,29 +128,6 @@ if __name__ == "__main__":
     #             ct+=1
     #         newFeat=n[0]+str(ct)+"."+n[1]
 
-    if (ct == -10):  # file numbering
-        if test == "True":
-            n = newFeat.split(".")
-            if len(n) == 2:
-                newFeat = n[0] + testExtension + str(ct) + "." + n[1]
-            else:
-                newFeat = n[0] + testExtension + str(ct)
-            n = newutt.split(".")
-            if len(n) == 2:
-                newutt = n[0] + testExtension + str(ct) + "." + n[1]
-            else:
-                newutt = n[0] + testExtension + str(ct)
-        else:
-            n = newFeat.split(".")
-            if len(n) == 2:
-                newFeat = n[0] + str(ct) + "." + n[1]
-            else:
-                newFeat = n[0] + str(ct)
-            n = newutt.split(".")
-            if len(n) == 2:
-                newutt = n[0] + str(ct) + "." + n[1]
-            else:
-                newutt = n[0] + str(ct)
     else:
         if test == "True":
         	newFeat=testExtension+newFeat

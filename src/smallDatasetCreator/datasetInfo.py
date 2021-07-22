@@ -52,9 +52,10 @@ def getInfos(fileName):
     return nbSpeaker,nbUtt,nbUttMinPerSpeaker,nbUttMaxPerSpeaker,nbUttMeanPerSpeaker
 
 if __name__ == "__main__":
-
+    '''
+    main
+    '''
     feat="feats.scp"
-
     ## args
     # do not give a same file name twice
     if (len(sys.argv)>=2):
