@@ -286,10 +286,10 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				# print("len=",len(z))
 				# print("z=",z)
 				wX=0
-				if newvectors[ct][i] not in z:
+				if newvectors[ct][i] not in z and newvectors[ct][i] not in criti:
 					wX = sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])) - sum2Witness(newvectors[ct][i], z, len(z))
 					#print(newutt[ct][i],":",abs(wX),"=",wX,"=", sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])),"-",sum2Witness(newvectors[ct][i], z, len(z)))
-					#wX=abs(wX)
+					# wX=abs(wX)
 				witness.append(wX)
 			max = -1
 			for i in range(len(witness)):	# for each witness value

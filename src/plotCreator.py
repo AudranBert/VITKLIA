@@ -1,5 +1,5 @@
 import os.path
-# import pyaudio
+import pyaudio
 import wave
 import run
 import re
@@ -551,7 +551,7 @@ def create2DPlotPrototypes(utt2D, xy, prototypes, criticisms, show=False, filePl
 	return plot
 
 
-def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, filePlotExport="plot.jpeg", dotSize=20,protoSize=25, dotLineWidth=1, protoLineWidth=1, soundsdir="", oneDotPerSpeaker=True,detailSpeakerClick=True, autoScaleDot=True):
+def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, filePlotExport="plot.jpeg", dotS=20,protoS=25, dotLineW=1, protoLineW=1, soundsdir="", oneDotPerSpeaker=True,detailSpeakerClick=True, autoScaleDot=False):
 	'''
 	create a 3D plot with prototypes and criticisms
 	:param utt3D:
@@ -581,7 +581,7 @@ def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, fil
 	xyz = xyz3D
 	utt = utt3D
 	setSound(soundsdir)
-	setOptions(dotS, dotLineW)
+	setOptions(dotS, dotLineW, protoS, protoLineW)
 	fig = plt.figure()
 	colorsOrdered, xyzOrdered, uttOrdered = chooseColor(xyz3D, utt3D)
 	colorsProto, colorsCrit = chooseColorProto(uttOrdered, xyzOrdered, colorsOrdered, prototypes, criticisms)
@@ -598,33 +598,53 @@ def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, fil
 			x[- 1].append(j[0])
 			y[- 1].append(j[1])
 			z[- 1].append(j[1])
-	xp = []
-	yp = []
-	zp = []
-	for i in prototypes:
-		# p = xyzOrdered[i[0]][i[1]]
-		xp.append(i[1])  # add the utt
-		yp.append(i[2])
-		zp.append(i[3])
+
 	xc = []
 	yc = []
 	zc = []
+	xp = []
+	yp = []
+	zp = []
+	np= []
+	# for i in range(len(uttOrdered)):
+	# 	for j in range(len(prototypes)):
+	# 		if prototypes[j][0] in uttOrdered[i]:
+	# 			a=uttOrdered[i].index(prototypes[j][0])
+	# 			xp.append(xyzOrdered[i][a][0])  # add the utt
+	# 			yp.append(xyzOrdered[i][a][1])
+	# 			zp.append(xyzOrdered[i][a][2])
+	# 			np.append([prototypes[j][0],xp[-1],yp[-1],zp[-1]])
 	for i in criticisms:
 		# c = xyzOrdered[i[0]][i[1]]
 		xc.append(i[1])  # add the utt
 		yc.append(i[2])
 		zc.append(i[3])
+	autoScale = []
+	if autoScaleDot:
+		autoScale = autoScaleFunction(np, lCriticisms, protoSize)
+
+	for i in prototypes:
+		# p = xyzOrdered[i[0]][i[1]]
+		xp.append(i[1])  # add the utt
+		yp.append(i[2])
+		zp.append(i[3])
 	ax = fig.add_subplot(projection='3d')
 	### place the points
 	for i in range(0, len(xyzOrdered)):
 		ax.scatter(x[i], y[i], z[i], s=dotSize, color=colorsOrdered[i], edgecolors='black', linewidth=dotLineWidth)
 	###
-	for i in range(0, len(prototypes)):
-		ax.scatter(xp[i], yp[i], zp[i], s=(dotSize * 1.1), color=colorsProto[i], marker="D", edgecolors='black',
-				   linewidth=protoLineWidth)
 	for i in range(0, len(criticisms)):
-		ax.scatter(xc[i], yc[i], zc[i], s=(dotSize * 1.1), color=colorsCrit[i], marker="^", edgecolors='black',
+		ax.scatter(xc[i], yc[i], zc[i], s=protoSize, color=colorsCrit[i], marker="^", edgecolors='black',
 				   linewidth=protoLineWidth)
+	for i in range(len(xp)):
+		# print(xp[i],"  ",xc[i])
+		# print(i)
+		if autoScaleDot:
+			ax.scatter(xp[i], yp[i],zp[i], color=colorsProto[i], s=autoScale[i], marker="D", edgecolors='black',
+					   linewidth=protoLineWidth)
+		else:
+			ax.scatter(xp[i], yp[i],zp[i], color=colorsProto[i], s=protoSize, marker="D", edgecolors='black',
+					   linewidth=protoLineWidth)
 	# bind press event with onclick function
 	cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick3D(event, ax, xyz, utt,oneDotPerSpeaker,detailSpeakerClick))
 	# plot labelling
@@ -644,7 +664,8 @@ def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, fil
 		plt.show()
 
 
-def create3DPlot(utt, xyz, show=False, filePlotExport="plot.jpeg", dotSize=20, soundsdir="", detailSpeakerClick=True):
+def create3DPlot(utt3D, xyz3D, show=False, filePlotExport="plot.jpeg", dotS=20, dotLineW=1, soundsdir="",
+				 detailSpeakerClick=True, title="Plot"):
 	'''
 	create a 3D plot
 	:param utt:
@@ -663,7 +684,7 @@ def create3DPlot(utt, xyz, show=False, filePlotExport="plot.jpeg", dotSize=20, s
 	x = []
 	y = []
 	z = []
-	for i in newutt:
+	for i in xyzOrdered:
 		x.append([])
 		y.append([])
 		z.append([])
@@ -673,8 +694,8 @@ def create3DPlot(utt, xyz, show=False, filePlotExport="plot.jpeg", dotSize=20, s
 			z[len(z) - 1].append(j[1])
 	ax = fig.add_subplot(projection='3d')
 	### place the points
-	for i in range(0, len(newutt)):
-		ax.scatter(x[i], y[i], z[i], s=dotSize, color=colorsOrdered[i])
+	for i in range(0, len(xyzOrdered)):
+		ax.scatter(x[i], y[i], z[i],s=dotSize, color=colorsOrdered[i], edgecolors='black', linewidth=dotLineWidth)
 	# bind press event with onclick function
 	cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick3D(event, ax, xyz, utt,detailSpeakerClick))
 	# plot labelling
