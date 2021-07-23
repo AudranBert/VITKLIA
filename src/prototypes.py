@@ -243,11 +243,11 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 	uttP=[]
 	uttC=[]
 	for ct in trange(nbPrototypesTot):
-		print("SPK=",ct)
-		print(run.uttToSpk(newutt[ct][0]))
+		# print("SPK=",ct)
+		# print(run.uttToSpk(newutt[ct][0]))
 		sum3 = sum3MMD(newvectors[ct], len(newvectors[ct]))
 		for j in range(nbPrototypes):	# select the prototypes
-			print("J=",j)
+			# print("J=",j)
 			#print("---------------------")
 			MMD=[]
 			for i in range(len(newvectors[ct])):	# for each point
@@ -267,7 +267,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				if ((min==-1 or MMD[min]>MMD[i])  and  (newvectors[ct][i] not in proto)) and MMD[i]!=-1:
 					min = i
 			if (min!=-1):	# add the prototype to the list
-				print("MIN: ",MMD[min])
+				# print("MIN: ",MMD[min])
 				proto.append(newvectors[ct][min])
 				uttP.append(newutt[ct][min])
 				grp.append([ct,min])
@@ -275,7 +275,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				# 	proto[-1].append(i)
 				z.append(newvectors[ct][min])
 			MMD.clear()
-		print("z=",z)
+		# print("z=",z)
 		for j in range(nbPrototypes):	# select the criticisms
 			witness = []
 			#print("len=",len(z))
@@ -288,7 +288,7 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 				wX=0
 				if newvectors[ct][i] not in z:
 					wX = sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])) - sum2Witness(newvectors[ct][i], z, len(z))
-					print(newutt[ct][i],":",abs(wX),"=",wX,"=", sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])),"-",sum2Witness(newvectors[ct][i], z, len(z)))
+					#print(newutt[ct][i],":",abs(wX),"=",wX,"=", sum1Witness(newvectors[ct][i], newvectors[ct], len(newvectors[ct])),"-",sum2Witness(newvectors[ct][i], z, len(z)))
 					#wX=abs(wX)
 				witness.append(wX)
 			max = -1
@@ -297,14 +297,14 @@ def prototypesEachSpeaker(newutt,newvectors,nbPrototypes=2,grid=True,kernelM="eu
 					max = i
 			if (max != -1):		# add the max to the crit list
 				# print("Tot:",len(newvectors[ct]))
-				print("MAX: ",newutt[ct][max], witness[max])
+				# print("MAX: ",newutt[ct][max], witness[max])
 				# print("z=", z)
 				criti.append(newvectors[ct][max])
 				uttC.append(newutt[ct][max])
 				grc.append([ct, max])
 				# if wX=abs(Wx) is in comment:
 				z.append(newvectors[ct][max])
-				#
+				# else the line in comment
 			witness.clear()
 		z.clear()
 			# print("------")

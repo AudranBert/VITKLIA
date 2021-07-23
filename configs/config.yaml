@@ -98,7 +98,7 @@ afterReduction: true
 # define the distance calculation
 kernel: "euclidienne"
 # if find proto is true, calculate the distance between prototypes and criticisms
-gridSearch: true
+gridSearch: false
 
 
 # Optimisation
