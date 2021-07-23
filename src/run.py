@@ -56,14 +56,14 @@ def checkPath(path,make=False):
     :param make:
     :return:
     '''
-    if not(os.path.exists(path)):
+    if (os.path.exists(path)):
         return True
     else:
         if make:
             os.makedirs(path)
             return True
         else:
-            print("Path :" + path + " does not exist")
+            print("Path : " + path + " does not exist")
             return False
 
 def errorExit(msg, code=-1):

@@ -438,7 +438,11 @@ def create2DPlot(utt2D, xy, show=False, filePlotExport="plot.jpeg", dotS=20, dot
 	plot.ylabel("Y")
 	plot.legend(loc='upper left')
 	plot.title(title)
-	if run.checkPath(filePlotExport):
+	f=filePlotExport.split("/")
+	if len(f)>1:
+		f.pop()
+	f="".join(f)
+	if run.checkPath(f):
 		plot.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show == True):
@@ -534,7 +538,11 @@ def create2DPlotPrototypes(utt2D, xy, prototypes, criticisms, show=False, filePl
 	plot.ylabel("Y")
 	# plot.legend(loc='upper left')
 	plot.title(title)
-	if run.checkPath(filePlotExport):
+	f=filePlotExport.split("/")
+	if len(f)>1:
+		f.pop()
+	f="".join(f)
+	if run.checkPath(f):
 		plot.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	# plot.ioff()
@@ -625,7 +633,11 @@ def create3DPlotPrototypes(utt3D, xyz3D, prototypes, criticisms, show=False, fil
 	ax.set_zlabel("Z")
 	# plt.legend(loc='upper left')
 	plt.title("PLOT")
-	if run.checkPath(filePlotExport):
+	f=filePlotExport.split("/")
+	if len(f)>1:
+		f.pop()
+	f="".join(f)
+	if run.checkPath(f):
 		plt.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show == True):
@@ -671,7 +683,11 @@ def create3DPlot(utt, xyz, show=False, filePlotExport="plot.jpeg", dotSize=20, s
 	ax.set_zlabel("Z")
 	# plt.legend(loc='upper left')
 	plt.title("PLOT")
-	if run.checkPath(filePlotExport):
+	f=filePlotExport.split("/")
+	if len(f)>1:
+		f.pop()
+	f="".join(f)
+	if run.checkPath(f):
 		plt.savefig(filePlotExport, dpi=1920)
 		print("Plot save to", filePlotExport)
 	if (show == True):

@@ -4,7 +4,7 @@
 
 This tool allows you to create small dataset using Voxceleb data. You can define how many speakers or utterances you want in the train and the test. You can choose the number of test.
 
-The main goal of the tool is to visualize vectors which are extracted from STKLIA for example. It also find the prototypes (from [Interpretable machine learning](https://christophm.github.io/interpretable-ml-book/proto.html)(the utterance that has the best representation of the data) and the criticisms (the utterance which are whether underrepresented or overrepresented). It reduces the vectors in the number of dimensions you want using UMAP (or UMAP and LDA or LDA). The plot that you obtains at the end show one color for each speaker and if you click on an utterance whether it plays the given utterance or it opens a new plot with the utterances of the speaker. Many things can be configured.
+The main goal of the tool is to visualize vectors which are extracted from STKLIA for example. It also find the prototypes (from [Interpretable machine learning](https://christophm.github.io/interpretable-ml-book/proto.html)) (this is the utterance that has the best representation of the data) and the criticisms (the utterance which are whether underrepresented or overrepresented). It reduces the vectors in the number of dimensions you want using UMAP (or UMAP and LDA or LDA). The plot that you obtains at the end show one color for each speaker and if you click on an utterance whether it plays the given utterance or it opens a new plot with the utterances of the speaker. Many things can be configured.
 
 ## Two main parts 
 
